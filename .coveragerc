@@ -1,0 +1,6 @@
+[run]
+source = inventory
+omit = 
+    tests/*
+    autoapp.py
+
