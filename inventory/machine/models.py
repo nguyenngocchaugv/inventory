@@ -36,6 +36,4 @@ class Machine(PkModel):
   
   location_id = reference_col("locations", nullable=True)
   location = relationship("Location", backref="machines")
-  
-  histories = relationship("MachineHistory", backref="machine")
 
