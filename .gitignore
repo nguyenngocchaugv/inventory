@@ -52,7 +52,7 @@ env/
 /inventory/static/build/
 
 # Configuration
-.env
+# .env
 
 # Development database
-*.db
+# *.db

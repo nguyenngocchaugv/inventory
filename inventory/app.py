@@ -7,7 +7,7 @@ import click
 from flask.cli import with_appcontext
 from flask import Flask, render_template
 
-from inventory import commands, public, user, location
+from inventory import commands, public, user, location, staff, machine, purchase_order, tool
 from inventory.extensions import (
     bcrypt,
     cache,
