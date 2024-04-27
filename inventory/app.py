@@ -3,9 +3,11 @@
 import logging
 import sys
 import os
+import click
+from flask.cli import with_appcontext
 from flask import Flask, render_template
 
-from inventory import commands, public, user
+from inventory import commands, public, user, location
 from inventory.extensions import (
     bcrypt,
     cache,
@@ -25,7 +27,8 @@ def create_app(config_object="inventory.settings"):
     """
     app = Flask(__name__.split(".")[0])
     app.config.from_object(config_object)
-    database_path = os.path.abspath(os.getcwd()) + '\dev.db'
+    # define the database path to be in the 'db' subfolder
+    database_path = os.path.join(os.getcwd(), 'db', 'dev.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + database_path
   
     register_extensions(app)
@@ -36,6 +39,12 @@ def create_app(config_object="inventory.settings"):
     configure_logger(app)
     return app
 
+@click.command("seed")
+@with_appcontext
+def seed_db():
+    """Seed the database."""
+    from db.seeds import seed
+    seed()
 
 def register_extensions(app):
     """Register Flask extensions."""
@@ -76,7 +85,10 @@ def register_shellcontext(app):
 
     def shell_context():
         """Shell context objects."""
-        return {"db": db, "User": user.models.User}
+        return {
+            "db": db,
+            "User": user.models.User
+        }
 
     app.shell_context_processor(shell_context)
 
@@ -85,6 +97,7 @@ def register_commands(app):
     """Register Click commands."""
     app.cli.add_command(commands.test)
     app.cli.add_command(commands.lint)
+    app.cli.add_command(seed_db)
 
 
 def configure_logger(app):

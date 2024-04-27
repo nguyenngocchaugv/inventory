@@ -54,6 +54,11 @@ class User(UserMixin, PkModel):
     def check_password(self, value):
         """Check password."""
         return bcrypt.check_password_hash(self._password, value)
+    
+    @classmethod
+    def find_by_username(self, username):
+        """Find a user by username."""
+        return self.query.filter_by(username=username).first()
 
     @property
     def full_name(self):
