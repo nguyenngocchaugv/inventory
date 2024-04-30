@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Locations models."""
 
-from inventory.database import PkModel, db, relationship
+from inventory.database import PkModel, db, relationship, reference_col
 
 class Location(PkModel):
   """A location of the app."""
@@ -15,7 +15,6 @@ class Location(PkModel):
   city = db.Column(db.String(20), nullable=False)
   principal = db.Column(db.String(20), nullable=False)
   telephone = db.Column(db.Integer, nullable=False)
-  location_type = db.Column(db.String(10), nullable=False)
   group = db.Column(db.String(10), nullable=False)
   num_class_total = db.Column('NumClassTotal', db.Integer, nullable=False)
   num_f1 = db.Column('NumF1', db.Integer, nullable=False)
@@ -26,6 +25,15 @@ class Location(PkModel):
   extra = db.Column('Extra', db.Boolean, nullable=False)
   status = db.Column('Status', db.Boolean, nullable=False)
   
+  location_type_id = reference_col("location_types", nullable=False)  
   # machines = relationship("Machine", backref="location")
   # machine_histories = relationship("MachineHistory", backref="location")
 
+class LocationType(PkModel):
+  """A location type of the app."""
+
+  __tablename__ = "location_types"
+  
+  name = db.Column(db.String(50), unique=True, nullable=False)
+  
+  locations = relationship("Location", backref="location_type")

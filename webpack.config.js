@@ -9,11 +9,11 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ProductionPlugins = [
   // production webpack plugins go here
   new webpack.DefinePlugin({
-    "process.env": {
-      NODE_ENV: JSON.stringify("production")
-    }
-  })
-]
+    'process.env': {
+      NODE_ENV: JSON.stringify('production'),
+    },
+  }),
+];
 
 const debug = process.env.NODE_ENV === 'production' ? 'production' : 'development';
 const rootAssetPath = path.join(__dirname, 'assets');
@@ -27,22 +27,23 @@ module.exports = {
       path.join(__dirname, 'node_modules', '@fortawesome', 'fontawesome-free', 'css', 'all.css'),
       path.join(__dirname, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.css'),
       path.join(__dirname, 'assets', 'css', 'style.css'),
+      path.join(__dirname, 'assets', 'css', 'location.css'),
     ],
   },
   mode: debug,
   output: {
-    chunkFilename: "[id].js",
-    filename: "[name].bundle.js",
-    path: path.join(__dirname, "inventory", "static", "build"),
-    publicPath: "/static/build/"
+    chunkFilename: '[id].js',
+    filename: '[name].bundle.js',
+    path: path.join(__dirname, 'inventory', 'static', 'build'),
+    publicPath: '/static/build/',
   },
   resolve: {
-    extensions: [".js", ".jsx", ".css"]
+    extensions: ['.js', '.jsx', '.css'],
   },
-  devtool: debug ? "eval-source-map" : false,
+  devtool: debug ? 'eval-source-map' : false,
   plugins: [
-    new MiniCssExtractPlugin({ filename: "[name].bundle.css" }),
-    new webpack.ProvidePlugin({ $: "jquery", jQuery: "jquery" })
+    new MiniCssExtractPlugin({ filename: '[name].bundle.css' }),
+    new webpack.ProvidePlugin({ $: 'jquery', jQuery: 'jquery' }),
   ].concat(debug ? [] : ProductionPlugins),
   module: {
     rules: [
@@ -74,10 +75,17 @@ module.exports = {
         test: /\.(ttf|eot|svg|png|jpe?g|gif|ico)(\?.*)?$/i,
         type: 'asset/resource',
         generator: {
-          filename: '[name][ext]'
-        }
+          filename: '[name][ext]',
+        },
       },
-      { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader', options: { presets: ["@babel/preset-env"], cacheDirectory: true } },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'], cacheDirectory: true,
+        },
+      },
     ],
-  }
+  },
 };

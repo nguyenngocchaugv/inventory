@@ -22,6 +22,8 @@ class ToolLocation(PkModel):
   __tablename__ = "tool_locations"
   
   quality = db.Column(db.Integer, nullable=False)
+  model = db.Column(db.String(10), nullable=False)
+  name = db.Column(db.String(50), nullable=False)
   price = db.Column(db.Integer, nullable=False)
   status = db.Column(db.Boolean, nullable=False)
   est_date = db.Column(db.Date, nullable=False)

@@ -12,8 +12,8 @@ body {
   padding-top: 60px;
 }
 
-section {
-  overflow: auto;
+main {
+  height: calc(100vh - 498px);
 }
 
 textarea {
@@ -50,37 +50,9 @@ textarea {
 /* footer */
 
 footer {
-  margin-top: 45px;
-  padding-top: 5px;
+  display: flex;
+  flex-direction: column;
   border-top: 1px solid #eaeaea;
   color: #999999;
 }
 
-footer a {
-  color: #999999;
-}
-
-footer p {
-  float: right;
-  margin-right: 25px;
-}
-
-footer ul {
-  list-style: none;
-}
-
-footer ul li {
-  float: left;
-  margin-left: 10px;
-}
-
-footer .company {
-  float: left;
-  margin-left: 25px;
-}
-
-footer .footer-nav {
-  float: right;
-  margin-right: 25px;
-  list-style: none;
-}
