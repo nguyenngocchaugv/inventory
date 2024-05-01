@@ -5,17 +5,20 @@ import datetime as dt
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from inventory.database import Column, PkModel, db, reference_col, relationship
+from inventory.database import Column, PkModel, db, relationship
 from inventory.extensions import bcrypt
 
+# Association table
+user_roles = db.Table('user_roles',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('role_id', db.Integer, db.ForeignKey('roles.id'))
+)
 
 class Role(PkModel):
     """A role for a user."""
 
     __tablename__ = "roles"
     name = Column(db.String(80), unique=True, nullable=False)
-    user_id = reference_col("users", nullable=True)
-    user = relationship("User", backref="roles")
 
     def __init__(self, name, **kwargs):
         """Create instance."""
@@ -40,6 +43,8 @@ class User(UserMixin, PkModel):
     last_name = Column(db.String(30), nullable=True)
     active = Column(db.Boolean(), default=False)
     is_admin = Column(db.Boolean(), default=False)
+    
+    roles = relationship('Role', secondary=user_roles, backref='users')
 
     @hybrid_property
     def password(self):

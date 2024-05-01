@@ -10,8 +10,16 @@ def seed():
   db.drop_all()
   db.create_all()
   
+  # Create roles
+  roles = ['SuperAdmin', 'Admin', 'User']
+  
+  for role_name in roles:
+    role = Role(name=role_name)
+    db.session.add(role)
+  db.session.commit()
+  
    # create a super admin user
-  super_admin = User(
+  super_admin_user = User(
     username='superadmin',
     email='superadmin@example.com',
     password='superadmin',
@@ -21,21 +29,22 @@ def seed():
     is_admin=True
   )
   
-  # add super admin user to the session
-  db.session.add(super_admin)
-
-  # commit the session to save the user object in the database
-  # SQLAlchemy will now have assigned an id to super_admin
+  super_admin_role = Role.query.filter_by(name='SuperAdmin').first()
+  super_admin_user.roles.append(super_admin_role)
+  db.session.add(super_admin_user)
   db.session.commit()
-
-  # create a role for super_admin
-  # reference the id of super_admin in the user_id field
-  super_admin_role = Role(name='super_admin', user_id=super_admin.id)
-
-  # add super admin role to the session
-  db.session.add(super_admin_role)
-
-  # commit the session to save the role object in the database
+  
+  # Create an Admin user
+  admin_user = User(
+    username='admin',
+    email='admin@example.com',
+    password='admin',
+    first_name='Admin',
+    last_name='User',
+    active=True,
+    is_admin=True
+  )
+  admin_role = Role.query.filter_by(name='Admin').first()
+  admin_user.roles.append(admin_role)
+  db.session.add(admin_user)
   db.session.commit()
-
-  # similarly, create and save other types of objects
