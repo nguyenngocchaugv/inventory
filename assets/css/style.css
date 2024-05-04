@@ -16,9 +16,23 @@ textarea {
   resize: vertical;
 }
 
-.container-narrow{
+.container-narrow {
   margin: 0 auto;
   max-width: 700px;
+}
+
+.dot-status {
+  height: 8px;
+  width: 8px;
+  background-color: currentColor;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+/* Tables */
+.table tbody tr:hover {
+  cursor: pointer;
 }
 
 /* Forms */

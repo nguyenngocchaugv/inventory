@@ -108,13 +108,3 @@
   </form>
 </div>
 {% endblock %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var fields = document.querySelectorAll('#locationForm input, #locationForm select');
-        fields.forEach(function(field) {
-            field.addEventListener('invalid', function() {
-                this.classList.add('is-invalid');
-            });
-        });
-  });
-</script>

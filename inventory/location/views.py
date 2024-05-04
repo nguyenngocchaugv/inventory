@@ -3,6 +3,7 @@
 from flask import (
   Blueprint,
   flash,
+  jsonify,
   redirect,
   render_template,
   url_for,
@@ -54,3 +55,14 @@ def new_location():
   else:
     flash_errors(form)
   return render_template("locations/new_location.html", form=form)
+
+@blueprint.route('/delete_location/<int:location_id>', methods=['POST'])
+@login_required
+def delete_location(location_id):
+  location = Location.query.get(location_id)
+  if location:
+    Location.delete(location)
+    flash("Location is deleted successfully.", "success")
+  else:
+    flash("Location not found.", "danger")
+  return jsonify({'redirect_url': url_for('location.locations')})

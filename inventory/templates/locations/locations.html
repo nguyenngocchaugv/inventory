@@ -4,33 +4,67 @@
   <h1>Welcome {{ current_user.username }}</h1>
   {% for role in current_user.roles %}
   <p>You have the role: {{ role.name }}</p>
-{% endfor %}
+  {% endfor %}
   <h3>Locations.</h3>
   <div class="d-flex justify-content-end">
     <a class="btn btn-primary" href="{{ url_for('location.new_location') }}">Add Location</a>
   </div>
   {% if locations %}
-  <table class="table table-striped">
+  <table class="table table-striped table-hover">
     <thead>
       <tr>
-        <th>Location</th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Street</th>
+        <th>City</th>
+        <th>Status</th>
         <th>Actions</th>
-    </tr>
+      </tr>
     </thead>
     <tbody>
       {% for location in locations %}
       <tr>
         <td>{{ location.name }}</td>
+        <td>{{ location.location_type.name }}</td>
+        <td>{{ location.street }}</td>
+        <td>{{ location.city }}</td>
+        <td class="{{ 'text-success' if location.status else 'text-danger' }}">
+          <span class="dot-status"></span> {{ 'Active' if location.status else 'Inactive' }}
+        </td>
         <td>
-          <a class="btn btn-primary">Edit</a>
-          <a class="btn btn-danger">Delete</a>
+          <a class="btn btn-sm btn-primary">Edit</a>
+          <a class="delete-btn btn btn-sm btn-danger"
+            data-url="{{ url_for('location.delete_location', location_id=location.id) }}"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteModal">
+            Delete
+          </a>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
-  <p>No locations found.</p>
+  <h4 class="text-center m-4">No locations found.</h4>
   {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Location</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this location?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" class="btn btn-danger" id="confirmDelete">Delete</a>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
