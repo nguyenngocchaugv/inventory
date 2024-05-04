@@ -3,3 +3,4 @@
 # from . import views  # noqa
 from . import models
 from . import views
+from . import forms

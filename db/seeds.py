@@ -1,5 +1,6 @@
 # db/seeds.py
 
+from inventory.location.models import LocationType
 from inventory.user.models import User, Role
 from inventory.extensions import (
   db,
@@ -47,4 +48,12 @@ def seed():
   admin_role = Role.query.filter_by(name='Admin').first()
   admin_user.roles.append(admin_role)
   db.session.add(admin_user)
+  db.session.commit()
+  
+  # Location Types
+  location_types = ['School', 'Warehouse', 'Supplier']
+  
+  for location_type_name in location_types:
+    location_type = LocationType(name=location_type_name)
+    db.session.add(location_type)
   db.session.commit()

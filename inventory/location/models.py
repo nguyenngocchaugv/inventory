@@ -21,13 +21,10 @@ class Location(PkModel):
   num_f2 = db.Column('NumF2', db.Integer, nullable=False)
   num_f3 = db.Column('NumF3', db.Integer, nullable=False)
   num_infant = db.Column('NumInfant', db.Integer, nullable=False)
-  office = db.Column('Office', db.Boolean, nullable=False)
-  extra = db.Column('Extra', db.Boolean, nullable=False)
+  office = db.Column('Office', db.Integer, nullable=False)
   status = db.Column('Status', db.Boolean, nullable=False)
   
   location_type_id = reference_col("location_types", nullable=False)  
-  # machines = relationship("Machine", backref="location")
-  # machine_histories = relationship("MachineHistory", backref="location")
 
 class LocationType(PkModel):
   """A location type of the app."""

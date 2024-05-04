@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mb-4">
+  <h1 class="mt-5">Add new Location</h1>
+  <form id="locationForm" method="POST">
+    {{ form.hidden_tag() }}
+    <div class="row">
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.name.label(class="form-label required") }}
+          {{ form.name(placeholder="Location name", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.location_type.label(class="form-label required") }}
+          {{ form.location_type(placeholder="Location Type", class="form-control form-select", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.street.label(class="form-label required") }}
+          {{ form.street(placeholder="Street", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.ward.label(class="form-label required") }}
+          {{ form.ward(placeholder="Ward", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.district.label(class="form-label required") }}
+          {{ form.district(placeholder="District", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.city.label(class="form-label required") }}
+          {{ form.city(placeholder="City", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.principal.label(class="form-label required") }}
+          {{ form.principal(placeholder="Principal", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.telephone.label(class="form-label required") }}
+          {{ form.telephone(placeholder="Telephone", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.group.label(class="form-label required") }}
+          {{ form.group(placeholder="Group", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.num_class_total.label(class="form-label required") }}
+          {{ form.num_class_total(placeholder="Total Class", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.num_f1.label(class="form-label required") }}
+          {{ form.num_f1(placeholder="Num F1", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.num_f2.label(class="form-label required") }}
+          {{ form.num_f2(placeholder="Num F2", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.num_f3.label(class="form-label required") }}
+          {{ form.num_f3(placeholder="Num F3", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.num_infant.label(class="form-label required") }}
+          {{ form.num_infant(placeholder="Num Infant", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.office.label(class="form-label required") }}
+          {{ form.office(placeholder="Office", class="form-control", required=True) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.status.label(class="form-label required") }}
+          {% for subfield in form.status %}
+            <span class="me-2">{{ subfield }} {{ subfield.label(class="form-label") }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+  </form>
+</div>
+{% endblock %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var fields = document.querySelectorAll('#locationForm input, #locationForm select');
+        fields.forEach(function(field) {
+            field.addEventListener('invalid', function() {
+                this.classList.add('is-invalid');
+            });
+        });
+  });
+</script>

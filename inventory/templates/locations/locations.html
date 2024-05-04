@@ -6,6 +6,9 @@
   <p>You have the role: {{ role.name }}</p>
 {% endfor %}
   <h3>Locations.</h3>
+  <div class="d-flex justify-content-end">
+    <a class="btn btn-primary" href="{{ url_for('location.new_location') }}">Add Location</a>
+  </div>
   {% if locations %}
   <table class="table table-striped">
     <thead>

@@ -65,6 +65,13 @@ flask db migrate
 flask db upgrade
 ```
 
+Seed Data
+Run the custom command to seed data, please aware that it will clear all existing data
+
+```text
+flask seed
+```
+
 ## Deployment
 
 When using Docker, reasonable production defaults are set in `docker compose.yml`
