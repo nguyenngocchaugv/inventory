@@ -25,6 +25,18 @@ def locations():
   locations = Location.query.order_by(desc(Location.id)).all()
   return render_template("locations/locations.html", locations=locations)
 
+@blueprint.route('/<int:location_id>', methods=['GET'])
+@login_required
+def view_location(location_id):
+  location = Location.query.get(location_id)
+  if location:
+    form = LocationForm(obj=location)
+    form.location_type.choices = [(lt.id, lt.name) for lt in LocationType.query.all()]
+    return render_template('locations/location.html', location=location, form=form, mode='View')
+  else:
+    flash("Location not found.", "danger")
+    return redirect(url_for('location.locations'))
+
 @blueprint.route("/new", methods=['GET', 'POST'])
 @login_required
 def new_location():
@@ -54,7 +66,29 @@ def new_location():
     return redirect(url_for('location.locations'))
   else:
     flash_errors(form)
-  return render_template("locations/new_location.html", form=form)
+  return render_template("locations/location.html", form=form, mode='Create')
+
+@blueprint.route("/<int:location_id>/edit", methods=['GET', 'POST'])
+@login_required
+def edit_location(location_id):
+  """View or edit a location."""
+  location = Location.query.get(location_id)
+  if not location:
+    flash("Location not found.", "danger")
+    return redirect(url_for('location.locations'))
+
+  form = LocationForm(request.form, obj=location)
+  form.location_type.choices = [(lt.id, lt.name) for lt in LocationType.query.all()]
+
+  if request.method == 'POST':
+    if form.validate_on_submit():
+      location.update(**form.data)
+      flash("Location is updated successfully.", "success")
+      return redirect(url_for('location.locations'))
+    else:
+        flash_errors(form)
+
+  return render_template("locations/location.html", form=form, mode='Edit', location=location)
 
 @blueprint.route('/delete_location/<int:location_id>', methods=['POST'])
 @login_required

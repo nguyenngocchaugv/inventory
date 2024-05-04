@@ -32,7 +32,7 @@
           <span class="dot-status"></span> {{ 'Active' if location.status else 'Inactive' }}
         </td>
         <td>
-          <a class="btn btn-sm btn-primary">Edit</a>
+          <a class="btn btn-sm btn-primary" href="{{ url_for('location.view_location', location_id=location.id) }}">View</a>
           <a class="delete-btn btn btn-sm btn-danger"
             data-url="{{ url_for('location.delete_location', location_id=location.id) }}"
             data-bs-toggle="modal"
