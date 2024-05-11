@@ -5,7 +5,7 @@
   {% for role in current_user.roles %}
   <p>You have the role: {{ role.name }}</p>
   {% endfor %}
-  <h3>Locations.</h3>
+  <h3>LOCATIONS</h3>
   <div class="d-flex justify-content-end">
     <a class="btn btn-primary" href="{{ url_for('location.new_location') }}">Add Location</a>
   </div>
@@ -33,10 +33,10 @@
         </td>
         <td>
           <a class="btn btn-sm btn-primary" href="{{ url_for('location.view_location', location_id=location.id) }}">View</a>
-          <a class="delete-btn btn btn-sm btn-danger"
+          <a id="locations-delete-btn" class="btn btn-sm btn-danger"
             data-url="{{ url_for('location.delete_location', location_id=location.id) }}"
             data-bs-toggle="modal"
-            data-bs-target="#deleteModal">
+            data-bs-target="#locationDeleteModal">
             Delete
           </a>
         </td>
@@ -50,11 +50,11 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+<div class="modal fade" id="locationDeleteModal" tabindex="-1" aria-labelledby="locationDeleteModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="deleteModalLabel">Delete Location</h5>
+        <h5 class="modal-title" id="locationDeleteModalLabel">Delete Location</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -62,7 +62,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <a href="#" class="btn btn-danger" id="confirmDelete">Delete</a>
+        <a href="#" class="btn btn-danger" id="locations-on-confirm-delete-btn">Delete</a>
       </div>
     </div>
   </div>

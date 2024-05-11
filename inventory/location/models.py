@@ -8,7 +8,7 @@ class Location(PkModel):
 
   __tablename__ = "locations"
   
-  name = db.Column(db.String(50), unique=True, nullable=False)  # Unique constraint added here
+  name = db.Column(db.String(50), unique=True, nullable=False)
   street = db.Column(db.String(20), nullable=False)
   ward = db.Column(db.String(20), nullable=False)
   district = db.Column(db.String(20), nullable=False)
@@ -25,6 +25,7 @@ class Location(PkModel):
   status = db.Column('Status', db.Boolean, nullable=False)
   
   location_type_id = reference_col("location_types", nullable=False)  
+  location_type = relationship("LocationType", backref="locations")
 
 class LocationType(PkModel):
   """A location type of the app."""
@@ -33,4 +34,4 @@ class LocationType(PkModel):
   
   name = db.Column(db.String(50), unique=True, nullable=False)
   
-  locations = relationship("Location", backref="location_type")
+ 

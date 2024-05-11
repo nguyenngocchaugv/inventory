@@ -6,8 +6,9 @@ import os
 import click
 from flask.cli import with_appcontext
 from flask import Flask, render_template
+from sqlalchemy import MetaData
 
-from inventory import commands, public, user, location, staff, machine, purchase_order, tool
+from inventory import commands, public, user, location, machine, tool
 from inventory.extensions import (
     bcrypt,
     cache,
@@ -50,6 +51,7 @@ def register_extensions(app):
     """Register Flask extensions."""
     bcrypt.init_app(app)
     cache.init_app(app)
+
     db.init_app(app)
     csrf_protect.init_app(app)
     login_manager.init_app(app)
@@ -64,6 +66,7 @@ def register_blueprints(app):
     app.register_blueprint(public.views.blueprint)
     app.register_blueprint(user.views.blueprint)
     app.register_blueprint(location.views.blueprint)
+    app.register_blueprint(machine.views.blueprint)
     return None
 
 
@@ -104,5 +107,7 @@ def register_commands(app):
 def configure_logger(app):
     """Configure loggers."""
     handler = logging.StreamHandler(sys.stdout)
+    file_handler = logging.FileHandler('flask.log')
     if not app.logger.handlers:
         app.logger.addHandler(handler)
+        app.logger.addHandler(file_handler)

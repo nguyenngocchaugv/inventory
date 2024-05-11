@@ -5,14 +5,8 @@ import datetime as dt
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from inventory.database import Column, PkModel, db, relationship
+from inventory.database import Column, PkModel, db, relationship, reference_col
 from inventory.extensions import bcrypt
-
-# Association table
-user_roles = db.Table('user_roles',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-    db.Column('role_id', db.Integer, db.ForeignKey('roles.id'))
-)
 
 class Role(PkModel):
     """A role for a user."""
@@ -33,18 +27,30 @@ class User(UserMixin, PkModel):
     """A user of the app."""
 
     __tablename__ = "users"
-    username = Column(db.String(80), unique=True, nullable=False)
+    first_name = Column(db.String(20), nullable=False)
+    last_name = Column(db.String(20), nullable=True)
     email = Column(db.String(80), unique=True, nullable=False)
+    telephone = Column(db.String(20), nullable=True)
+    username = Column(db.String(80), unique=True, nullable=False)
     _password = Column("password", db.LargeBinary(128), nullable=True)
+    street = Column(db.String(20), nullable=True)
+    ward = Column(db.String(20), nullable=True)
+    district = Column(db.String(20), nullable=True)
+    city = Column(db.String(20), nullable=True)
+    state = Column(db.String(20), nullable=True)
+    zip_code = Column(db.String(20), nullable=True)
+    position = Column(db.String(50), nullable=False)
+    work_duration = Column(db.Integer, nullable=False)
+    status = Column(db.Boolean(), default=True)
+    
     created_at = Column(
         db.DateTime, nullable=False, default=dt.datetime.now(dt.timezone.utc)
     )
-    first_name = Column(db.String(30), nullable=True)
-    last_name = Column(db.String(30), nullable=True)
+   
     active = Column(db.Boolean(), default=False)
-    is_admin = Column(db.Boolean(), default=False)
     
-    roles = relationship('Role', secondary=user_roles, backref='users')
+    role_id = reference_col("roles", nullable=False)
+    role = relationship("Role", backref="users")
 
     @hybrid_property
     def password(self):

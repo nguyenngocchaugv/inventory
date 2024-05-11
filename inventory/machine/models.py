@@ -1,39 +1,52 @@
 # -*- coding: utf-8 -*-
 """Machines models."""
 
-from inventory.database import PkModel, db, reference_col, relationship
+from inventory.database import Column, PkModel, db, relationship, reference_col
+import datetime as dt
 
-class MachineHistory(PkModel):
-   """A machine history of the app."""
+class RentInvoice(PkModel):
+  """A rent invoice of the app."""
 
-   __tablename__ = "machine_histories"
+  __tablename__ = "rent_invoices"
+  
+  name = Column(db.String(10), nullable=False)
+  serial = Column(db.String(10), nullable=False)
+  est_date = Column(db.DateTime, nullable=False)
+  created_date = Column(db.DateTime, nullable=False, default=dt.datetime.now(dt.timezone.utc))
+  status = Column(db.String(10), nullable=False)
+  price = Column(db.Numeric(precision=10, scale=2), nullable=False)
+  type = Column(db.String(10), nullable=False)
+  
+  location_id = reference_col("locations", nullable=False)
+  location = relationship("Location", backref="rent_invoices")
+  
+  machine_id = reference_col("machines", nullable=False)
+  machine = relationship("Machine", backref="rent_invoices")
+  
+  user_id = reference_col("users", nullable=False)
+  user = relationship("User", backref="rent_invoices")
+  
+class RentInvoiceDetail(PkModel):
+  """A rent invoice detail of the app."""
 
-   type = db.Column(db.String(20), nullable=False)
-   location = db.Column(db.String(20), nullable=False)
-   estimated_date = db.Column('EstimatedDate', db.Date, nullable=False)
+  __tablename__ = "rent_invoice_details"
+  
+  status = Column(db.String(10), nullable=False)
+  created_date = Column(db.DateTime, nullable=False, default=dt.datetime.now(dt.timezone.utc))
+  
+  rent_invoice_id = reference_col("rent_invoices", nullable=False)
+  rent_invoice = relationship("RentInvoice", backref="rent_invoice_details") 
    
-   machine_id = reference_col("machines", nullable=True)
-   machine = relationship("Machine", backref="histories")
-   
-   location_id = reference_col("locations", nullable=True)
-   location = relationship("Location", backref="histories")
-   
-   staff_id = reference_col("staffs", nullable=True)
-   staff = relationship("Staff", backref="histories")
-   
-
 class Machine(PkModel):
   """A machine of the app."""
 
   __tablename__ = "machines"
   
-  type = db.Column(db.String(20), nullable=False)
-  serial = db.Column(db.String(20), nullable=False)
-  model = db.Column(db.String(20), nullable=False)
-  price = db.Column(db.Integer, nullable=False)
-  status = db.Column(db.String(20), nullable=False)
-  description = db.Column(db.String(100), nullable=False)
-  
-  location_id = reference_col("locations", nullable=True)
-  location = relationship("Location", backref="machines")
+  name = Column(db.String(10), nullable=False)
+  description = Column(db.String(100), nullable=True)
+  type = Column(db.String(10), nullable=False)
+  serial = Column(db.String(10), nullable=False)
+  model = Column(db.String(10), nullable=False)
+  price = Column(db.Numeric(precision=10, scale=2), nullable=False)
+  status = Column(db.String(10), nullable=False)
 

@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """Public forms."""
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, IntegerField, BooleanField, SubmitField, RadioField, ValidationError
+from wtforms import HiddenField, SelectField, StringField, IntegerField, SubmitField, RadioField, ValidationError
 from wtforms.validators import DataRequired
 
-from inventory.location.models import Location, LocationType
-from inventory.user.models import User
+from inventory.location.models import Location
 
 class LocationForm(FlaskForm):
   """Location form."""
-
+  id = HiddenField()
   name = StringField('Location Name', validators=[DataRequired()])
   location_type = SelectField('Location Type', coerce=int)
   street = StringField('Street', validators=[DataRequired()])
@@ -30,5 +29,6 @@ class LocationForm(FlaskForm):
   
   def validate_name(self, field):
     """Validate location name."""
-    if Location.query.filter_by(name=field.data).first():
+    location = Location.query.filter_by(name=field.data).first()
+    if location and (not self.id.data or location.id != int(self.id.data)):
       raise ValidationError('Location name already registered')

@@ -1,11 +1,12 @@
 $(() => {
+  // Delete location confirmation
   let deleteUrl;
 
-  $('.delete-btn').on('click', (event) => {
+  $('#locations-delete-btn').on('click', (event) => {
     deleteUrl = $(event.currentTarget).data('url');
   });
 
-  $('#confirmDelete').on('click', (event) => {
+  $('#locations-on-confirm-delete-btn').on('click', (event) => {
     event.preventDefault();
     if (!deleteUrl) {
       return;
@@ -22,5 +23,21 @@ $(() => {
       .then((data) => {
         window.location.href = data.redirect_url;
       });
+  });
+
+  // Discard changes
+  let discardUrl;
+
+  $('#location-discard-changes-btn').on('click', (event) => {
+    discardUrl = $(event.currentTarget).data('url');
+  });
+
+  $('#location-on-discard-changes-btn').on('click', (event) => {
+    event.preventDefault();
+    if (!discardUrl) {
+      return;
+    }
+
+    window.location.href = discardUrl;
   });
 });
