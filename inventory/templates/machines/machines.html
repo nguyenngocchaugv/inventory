@@ -3,39 +3,43 @@
 <div class="container">
   <h3>MACHINES</h3>
   <div class="d-flex justify-content-end">
-    <a class="btn btn-primary" href="#">Add Machine</a>
+    <a class="btn btn-primary" href="{{ url_for('machine.new_machine') }}">Add Machine</a>
   </div>
   {% if machines %}
   <table class="table table-striped table-hover">
     <thead>
       <tr>
+        <th>#</th>
         <th>Name</th>
         <th>Type</th>
         <th>Serial</th>
         <th>Model</th>
         <th>Price</th>
+        <th>Status</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       {% for machine in machines %}
       <tr>
+        <td>{{ loop.index }}</td>
         <td>{{ machine.name }}</td>
         <td>{{ machine.type }}</td>
         <td>{{ machine.serial }}</td>
+        <td>{{ machine.model }}</td>
         <td>{{ machine.price }} $</td>
         <td>{{ machine.status }}</td>
         <!-- <td class="{{ 'text-success' if machine.status else 'text-danger' }}">
           <span class="dot-status"></span> {{ 'Active' if machine.status else 'Inactive' }}
         </td> -->
         <td>
-          <!-- <a class="btn btn-sm btn-primary" href="{{ url_for('machine.view_machine', machine_id=machine.id) }}">View</a>
+          <a class="btn btn-sm btn-primary" href="{{ url_for('machine.view_machine', machine_id=machine.id) }}">View</a>
           <a id="machines-delete-btn" class="btn btn-sm btn-danger"
             data-url="{{ url_for('machine.delete_machine', machine_id=machine.id) }}"
             data-bs-toggle="modal"
             data-bs-target="#machineDeleteModal">
             Delete
-          </a> -->
+          </a>
         </td>
       </tr>
       {% endfor %}

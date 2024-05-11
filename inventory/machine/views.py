@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Location views."""
+"""Machine views."""
 from flask import (
   Blueprint,
-  app,
   flash,
   jsonify,
   redirect,
@@ -13,8 +12,7 @@ from flask import (
 from flask import current_app
 from flask_login import login_required
 from sqlalchemy import desc
-from inventory.location.forms import LocationForm
-from inventory.location.models import Location, LocationType
+from inventory.machine.forms import MachineForm
 from inventory.machine.models import Machine
 from inventory.utils import flash_errors
 
@@ -28,101 +26,78 @@ def machines():
   machines = Machine.query.order_by(desc(Machine.id)).all()
   return render_template("machines/machines.html", machines=machines)
 
-# @blueprint.route('/<int:location_id>', methods=['GET'])
-# @login_required
-# def view_location(location_id):
-#   location = Location.query.get(location_id)
-#   if location:
-#     form = LocationForm(obj=location)
-#     form.location_type.choices = [(lt.id, lt.name) for lt in LocationType.query.all()]
-#     return render_template('locations/location.html', location=location, form=form, mode='View')
-#   else:
-#     flash("Location not found.", "danger")
-#     return redirect(url_for('location.locations'))
+@blueprint.route('/<int:machine_id>', methods=['GET'])
+@login_required
+def view_machine(machine_id):
+  machine = Machine.query.get(machine_id)
+  if machine:
+    form = MachineForm(obj=machine)
+    return render_template('machines/machine.html', machine=machine, form=form, mode='View')
+  else:
+    flash("Machine not found.", "danger")
+    return redirect(url_for('machine.machines'))
 
-# @blueprint.route("/new", methods=['GET', 'POST'])
-# @login_required
-# def new_location():
-#   """Create a new location."""
-#   form = LocationForm(request.form)
-#   form.location_type.choices = [(lt.id, lt.name) for lt in LocationType.query.all()]
-#   if form.validate_on_submit():
-#     Location.create(
-#       name=form.name.data,
-#       street=form.street.data,
-#       ward=form.ward.data,
-#       district=form.district.data,
-#       city=form.city.data,
-#       principal=form.principal.data,
-#       telephone=form.telephone.data,
-#       group=form.group.data,
-#       num_class_total=form.num_class_total.data,
-#       num_f1=form.num_f1.data,
-#       num_f2=form.num_f2.data,
-#       num_f3=form.num_f3.data,
-#       num_infant=form.num_infant.data,
-#       office=form.office.data,
-#       status=form.status.data == 'True',
-#       location_type_id=form.location_type.data
-#     )
-#     flash("Location is created successfully.", "success")
-#     return redirect(url_for('location.locations'))
-#   else:
-#     flash_errors(form)
-#   return render_template("locations/location.html", form=form, mode='Create')
+@blueprint.route("/new", methods=['GET', 'POST'])
+@login_required
+def new_machine():
+  """Create a new machine."""
+  form = MachineForm(request.form)
+  current_app.logger.info(form.data)
 
-# @blueprint.route("/<int:location_id>/edit", methods=['GET', 'POST'])
-# @login_required
-# def edit_location(location_id):
-#   """View or edit a location."""
-#   location = Location.query.get(location_id)
-#   if not location:
-#     flash("Location not found.", "danger")
-#     return redirect(url_for('location.locations'))
+  if form.validate_on_submit():
+    Machine.create(
+      name=form.name.data,
+      description=form.description.data,
+      type=form.type.data,
+      serial=form.serial.data,
+      model=form.model.data,
+      price=form.price.data,
+      status=form.status.data,
+    )
+    flash("Machine is created successfully.", "success")
+    return redirect(url_for('machine.machines'))
+  else:
+    flash_errors(form)
+  return render_template("machines/machine.html", form=form, mode='Create')
 
-#   if request.method == 'POST':
-#     form = LocationForm(request.form)
-#     # form.hidden_id.data = int(location_id)
+@blueprint.route("/<int:machine_id>/edit", methods=['GET', 'POST'])
+@login_required
+def edit_machine(machine_id):
+  """View or edit a machine."""
+  machine = Machine.query.get(machine_id)
+  if not machine:
+    flash("Machine not found.", "danger")
+    return redirect(url_for('machine.machines'))
+
+  if request.method == 'POST':
+    form = MachineForm(request.form)
+  else:
+    form = MachineForm(obj=machine)
     
-#     current_app.logger.info(location)
-#   else:
-#     form = LocationForm(obj=location)
-    
-#   form.location_type.choices = [(lt.id, lt.name) for lt in LocationType.query.all()]
+  if form.validate_on_submit():
+    machine.update( 
+      name=form.name.data,
+      description=form.description.data,
+      type=form.type.data,
+      serial=form.serial.data,
+      model=form.model.data,
+      price=form.price.data,
+      status=form.status.data,
+    )
+    flash("Machine is updated successfully.", "success")
+    return redirect(url_for('machine.view_machine', machine_id=machine.id))
+  else:
+      flash_errors(form)
 
-#   if form.validate_on_submit():
-#     location.update( 
-#       name=form.name.data,
-#       street=form.street.data,
-#       ward=form.ward.data,
-#       district=form.district.data,
-#       city=form.city.data,
-#       principal=form.principal.data,
-#       telephone=form.telephone.data,
-#       group=form.group.data,
-#       num_class_total=form.num_class_total.data,
-#       num_f1=form.num_f1.data,
-#       num_f2=form.num_f2.data,
-#       num_f3=form.num_f3.data,
-#       num_infant=form.num_infant.data,
-#       office=form.office.data,
-#       status=form.status.data == 'True',
-#       location_type_id=form.location_type.data
-#     )
-#     flash("Location is updated successfully.", "success")
-#     return redirect(url_for('location.view_location', location_id=location.id))
-#   else:
-#       flash_errors(form)
+  return render_template("machines/machine.html", form=form, mode='Edit', machine=machine)
 
-#   return render_template("locations/location.html", form=form, mode='Edit', location=location)
-
-# @blueprint.route('/delete_location/<int:location_id>', methods=['POST'])
-# @login_required
-# def delete_location(location_id):
-#   location = Location.query.get(location_id)
-#   if location:
-#     Location.delete(location)
-#     flash("Location is deleted successfully.", "success")
-#   else:
-#     flash("Location not found.", "danger")
-#   return jsonify({'redirect_url': url_for('location.locations')})
+@blueprint.route('/delete_machine/<int:machine_id>', methods=['POST'])
+@login_required
+def delete_machine(machine_id):
+  machine = Machine.query.get(machine_id)
+  if machine:
+    Machine.delete(machine)
+    flash("Machine is deleted successfully.", "success")
+  else:
+    flash("Machine not found.", "danger")
+  return jsonify({'redirect_url': url_for('machine.machines')})

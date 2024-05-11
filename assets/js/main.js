@@ -19,3 +19,4 @@ require.context(
 require('./plugins');
 require('./script');
 require('./location');
+require('./machine');
