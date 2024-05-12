@@ -2,3 +2,4 @@
 """The machine module."""
 # from . import views  # noqa
 from . import models
+from . import views

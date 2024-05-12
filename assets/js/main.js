@@ -20,3 +20,4 @@ require('./plugins');
 require('./script');
 require('./location');
 require('./machine');
+require('./tool');

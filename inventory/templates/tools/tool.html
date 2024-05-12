@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+  <h1 class="mt-5">{{ mode }} tool</h1>
+  <form id="toolForm" method="{{ 'POST' if mode != 'View' else 'GET' }}">
+    {{ form.hidden_tag() }}
+    <div class="d-flex justify-content-end gap-2 my-4">
+      {% if mode == 'View' %}
+      <a href="{{ url_for('tool.edit_tool', tool_id=tool.id) }}" class="btn btn-primary">Edit</a>
+      {% elif mode == 'Edit' %}
+      {{ form.submit(class="btn btn-primary", value="Update") }}
+      <a id="tool-discard-changes-btn" class="btn btn-danger"
+        data-url="{{ url_for('tool.view_tool', tool_id=tool.id) }}"
+        data-bs-toggle="modal"
+        data-bs-target="#toolDiscardChangesModal">Discard</a>
+      {% elif mode == 'Create' %}
+      {{ form.submit(class="btn btn-primary", value="Submit") }}
+      {% endif %}
+      <a class="btn btn-secondary" href="{{ url_for('tool.tools') }}">Back</a>
+    </div>
+    <div class="row">
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.name.label(class="form-label required") }}
+          {{ form.name(placeholder="Name", class="form-control", required=mode != 'View', disabled=mode ==
+          'View') }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.type.label(class="form-label required") }}
+          {{ form.type(placeholder="Type", class="form-control", required=mode != 'View', disabled=mode == 'View') }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.model.label(class="form-label required") }}
+          {{ form.model(placeholder="Model", class="form-control", required=mode != 'View', disabled=mode == 'View')
+          }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.price.label(class="form-label required") }}
+          {{ form.price(placeholder="Price", class="form-control", required=mode != 'View', disabled=mode == 'View') }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.quantity.label(class="form-label required") }}
+          {{ form.quantity(placeholder="Quantity", class="form-control", required=mode != 'View', disabled=mode ==
+          'View') }}
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="toolDiscardChangesModal" tabindex="-1" aria-labelledby="toolDiscardChangesModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="toolDiscardChangesModalLabel">Confirm Discard Changes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to discard changes?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <a href="#" class="btn btn-danger" id="tool-on-discard-changes-btn">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

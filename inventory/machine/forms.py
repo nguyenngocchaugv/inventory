@@ -6,14 +6,12 @@ from wtforms import HiddenField, SelectField, StringField, IntegerField, SubmitF
 from wtforms.validators import DataRequired
 from enum import Enum
 
+from inventory.utils import validate_decimal_places
+
 class Status(Enum):
   READY = "READY"
   FIXING = "FIXING"
   HIRING = "HIRING"
-    
-def validate_decimal_places(form, field):
-  if round(field.data, 2) != field.data:
-    raise ValidationError('Field must have at most 2 decimal places.')
     
       
 class MachineForm(FlaskForm):
