@@ -1,28 +1,28 @@
 # -*- coding: utf-8 -*-
 """Locations models."""
 
-from inventory.database import PkModel, db, relationship, reference_col
+from inventory.database import Column, PkModel, db, relationship, reference_col
 
 class Location(PkModel):
   """A location of the app."""
 
   __tablename__ = "locations"
   
-  name = db.Column(db.String(50), unique=True, nullable=False)
-  street = db.Column(db.String(20), nullable=False)
-  ward = db.Column(db.String(20), nullable=False)
-  district = db.Column(db.String(20), nullable=False)
-  city = db.Column(db.String(20), nullable=False)
-  principal = db.Column(db.String(20), nullable=False)
-  telephone = db.Column(db.Integer, nullable=False)
-  group = db.Column(db.String(10), nullable=False)
-  num_class_total = db.Column('NumClassTotal', db.Integer, nullable=False)
-  num_f1 = db.Column('NumF1', db.Integer, nullable=False)
-  num_f2 = db.Column('NumF2', db.Integer, nullable=False)
-  num_f3 = db.Column('NumF3', db.Integer, nullable=False)
-  num_infant = db.Column('NumInfant', db.Integer, nullable=False)
-  office = db.Column('Office', db.Integer, nullable=False)
-  status = db.Column('Status', db.Boolean, nullable=False)
+  name = Column(db.String(50), unique=True, nullable=False)
+  street = Column(db.String(20), nullable=False)
+  ward = Column(db.String(20), nullable=False)
+  district = Column(db.String(20), nullable=False)
+  city = Column(db.String(20), nullable=False)
+  principal = Column(db.String(20), nullable=False)
+  telephone = Column(db.Integer, nullable=False)
+  group = Column(db.String(10), nullable=False)
+  num_class_total = Column('NumClassTotal', db.Integer, nullable=False)
+  num_f1 = Column('NumF1', db.Integer, nullable=False)
+  num_f2 = Column('NumF2', db.Integer, nullable=False)
+  num_f3 = Column('NumF3', db.Integer, nullable=False)
+  num_infant = Column('NumInfant', db.Integer, nullable=False)
+  office = Column('Office', db.Integer, nullable=False)
+  status = Column('Status', db.Boolean, nullable=False)
   
   location_type_id = reference_col("location_types", nullable=False)  
   location_type = relationship("LocationType", backref="locations")
@@ -32,6 +32,6 @@ class LocationType(PkModel):
 
   __tablename__ = "location_types"
   
-  name = db.Column(db.String(50), unique=True, nullable=False)
+  name = Column(db.String(50), unique=True, nullable=False)
   
  

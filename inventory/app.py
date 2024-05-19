@@ -22,6 +22,8 @@ from inventory.extensions import (
 
 # Define the custom filter function
 def format_thousands(value):
+    if value is None:
+        return ''
     return '{:,}'.format(value)
 
 

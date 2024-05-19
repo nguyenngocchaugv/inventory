@@ -33,6 +33,7 @@ def view_location(location_id):
   if location:
     form = LocationForm(obj=location)
     form.location_type.choices = [(lt.id, lt.name) for lt in LocationType.query.all()]
+    form.location_type.data = location.location_type.id  # Set the selected value
     return render_template('locations/location.html', location=location, form=form, mode='View')
   else:
     flash("Location not found.", "danger")
@@ -86,6 +87,7 @@ def edit_location(location_id):
     form = LocationForm(obj=location)
     
   form.location_type.choices = [(lt.id, lt.name) for lt in LocationType.query.all()]
+  form.location_type.data = location.location_type.id  # Set the selected value
 
   if form.validate_on_submit():
     location.update( 

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: eb4723ae6662
+Revision ID: 88524815ea48
 Revises: 
-Create Date: 2024-05-11 18:57:17.858179
+Create Date: 2024-05-12 21:56:36.673316
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'eb4723ae6662'
+revision = '88524815ea48'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,6 +21,10 @@ def upgrade():
     op.create_table('location_types',
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_date', sa.DateTime(), nullable=False),
+    sa.Column('updated_date', sa.DateTime(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=True),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
@@ -30,14 +34,22 @@ def upgrade():
     sa.Column('type', sa.String(length=10), nullable=False),
     sa.Column('serial', sa.String(length=10), nullable=False),
     sa.Column('model', sa.String(length=10), nullable=False),
-    sa.Column('price', sa.Integer(), nullable=False),
+    sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('status', sa.String(length=10), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_date', sa.DateTime(), nullable=False),
+    sa.Column('updated_date', sa.DateTime(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=True),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('roles',
     sa.Column('name', sa.String(length=80), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_date', sa.DateTime(), nullable=False),
+    sa.Column('updated_date', sa.DateTime(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=True),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
@@ -45,9 +57,13 @@ def upgrade():
     sa.Column('name', sa.String(length=20), nullable=False),
     sa.Column('type', sa.String(length=10), nullable=False),
     sa.Column('model', sa.String(length=20), nullable=False),
-    sa.Column('price', sa.Integer(), nullable=False),
+    sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_date', sa.DateTime(), nullable=False),
+    sa.Column('updated_date', sa.DateTime(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=True),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('locations',
@@ -68,6 +84,10 @@ def upgrade():
     sa.Column('Status', sa.Boolean(), nullable=False),
     sa.Column('location_type_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_date', sa.DateTime(), nullable=False),
+    sa.Column('updated_date', sa.DateTime(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=True),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['location_type_id'], ['location_types.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
@@ -92,6 +112,10 @@ def upgrade():
     sa.Column('active', sa.Boolean(), nullable=True),
     sa.Column('role_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_date', sa.DateTime(), nullable=False),
+    sa.Column('updated_date', sa.DateTime(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=True),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
@@ -101,14 +125,17 @@ def upgrade():
     sa.Column('name', sa.String(length=10), nullable=False),
     sa.Column('serial', sa.String(length=10), nullable=False),
     sa.Column('est_date', sa.DateTime(), nullable=False),
-    sa.Column('created_date', sa.DateTime(), nullable=False),
     sa.Column('status', sa.String(length=10), nullable=False),
-    sa.Column('price', sa.Integer(), nullable=False),
+    sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('type', sa.String(length=10), nullable=False),
     sa.Column('location_id', sa.Integer(), nullable=False),
     sa.Column('machine_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_date', sa.DateTime(), nullable=False),
+    sa.Column('updated_date', sa.DateTime(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=True),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['location_id'], ['locations.id'], ),
     sa.ForeignKeyConstraint(['machine_id'], ['machines.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
@@ -118,23 +145,29 @@ def upgrade():
     sa.Column('name', sa.String(length=20), nullable=False),
     sa.Column('type', sa.String(length=10), nullable=False),
     sa.Column('model', sa.String(length=20), nullable=False),
-    sa.Column('price', sa.Integer(), nullable=False),
+    sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('est_date', sa.DateTime(), nullable=False),
-    sa.Column('created_date', sa.DateTime(), nullable=False),
     sa.Column('status', sa.String(length=10), nullable=False),
     sa.Column('tool_id', sa.Integer(), nullable=False),
     sa.Column('location_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_date', sa.DateTime(), nullable=False),
+    sa.Column('updated_date', sa.DateTime(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=True),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['location_id'], ['locations.id'], ),
     sa.ForeignKeyConstraint(['tool_id'], ['tools.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('rent_invoice_details',
     sa.Column('status', sa.String(length=10), nullable=False),
-    sa.Column('created_date', sa.DateTime(), nullable=False),
     sa.Column('rent_invoice_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_date', sa.DateTime(), nullable=False),
+    sa.Column('updated_date', sa.DateTime(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=True),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['rent_invoice_id'], ['rent_invoices.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

@@ -21,3 +21,4 @@ require('./script');
 require('./location');
 require('./machine');
 require('./tool');
+require('./user');

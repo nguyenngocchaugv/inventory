@@ -2,7 +2,6 @@
 """Machines models."""
 
 from inventory.database import Column, PkModel, db, relationship, reference_col
-import datetime as dt
 
 class RentInvoice(PkModel):
   """A rent invoice of the app."""
@@ -12,7 +11,7 @@ class RentInvoice(PkModel):
   name = Column(db.String(10), nullable=False)
   serial = Column(db.String(10), nullable=False)
   est_date = Column(db.DateTime, nullable=False)
-  created_date = Column(db.DateTime, nullable=False, default=dt.datetime.now(dt.timezone.utc))
+
   status = Column(db.String(10), nullable=False)
   price = Column(db.Numeric(precision=10, scale=2), nullable=False)
   type = Column(db.String(10), nullable=False)
@@ -32,7 +31,6 @@ class RentInvoiceDetail(PkModel):
   __tablename__ = "rent_invoice_details"
   
   status = Column(db.String(10), nullable=False)
-  created_date = Column(db.DateTime, nullable=False, default=dt.datetime.now(dt.timezone.utc))
   
   rent_invoice_id = reference_col("rent_invoices", nullable=False)
   rent_invoice = relationship("RentInvoice", backref="rent_invoice_details") 

@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="container">
+<div class="container my-4">
   <h3>MACHINES</h3>
   <div class="d-flex justify-content-end">
-    <a class="btn btn-primary" href="{{ url_for('machine.new_machine') }}">Add Machine</a>
+    <a class="btn btn-primary" href="{{ url_for('machine.new_machine') }}"><i class="fa-solid fa-plus"></i> Add Machine</a>
   </div>
   {% if machines %}
   <table class="table table-striped table-hover">
@@ -27,7 +27,7 @@
         <td>{{ machine.type }}</td>
         <td>{{ machine.serial }}</td>
         <td>{{ machine.model }}</td>
-        <td>{{ machine.price }} $</td>
+        <td>{{ machine.price|format_thousands }} $</td>
         <td>{{ machine.status }}</td>
         <!-- <td class="{{ 'text-success' if machine.status else 'text-danger' }}">
           <span class="dot-status"></span> {{ 'Active' if machine.status else 'Inactive' }}
