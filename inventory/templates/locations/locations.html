@@ -1,10 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="container">
-  <h1>Welcome {{ current_user.username }}</h1>
-  {% for role in current_user.roles %}
-  <p>You have the role: {{ role.name }}</p>
-  {% endfor %}
+<div class="container my-4">
   <h3>LOCATIONS</h3>
   <div class="d-flex justify-content-end">
     <a class="btn btn-primary" href="{{ url_for('location.new_location') }}"><i class="fa-solid fa-plus"></i> Add Location</a>

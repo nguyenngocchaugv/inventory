@@ -26,6 +26,7 @@ class Location(PkModel):
   
   location_type_id = reference_col("location_types", nullable=False)  
   location_type = relationship("LocationType", backref="locations")
+  is_deleted = Column(db.Boolean, default=False)
 
 class LocationType(PkModel):
   """A location type of the app."""

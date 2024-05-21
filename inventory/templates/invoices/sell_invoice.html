@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container my-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Create Invoice</li>
+    </ol>
+  </nav>
+  <h1 class="my-2">Create Invoice</h1>
+  <form id="invoiceForm" method="POST">
+    {{ form.hidden_tag() }}
+    <div class="d-flex justify-content-end gap-2 my-4">
+      <div>
+        {{ form.submit(class="btn btn-primary", value="Submit") }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.name.label(class="form-label required") }}
+          {{ form.name(placeholder="Invoice Name", class="form-control", required=true) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.description.label(class="form-label required") }}
+          {{ form.description(placeholder="Description", class="form-control", required=true) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.issue_date.label(class="form-label required") }}
+          {{ form.issue_date(type='date', placeholder="Issue Date", class="form-control", required=true) }}
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.location.label(class="form-label required") }}
+          {{ form.location(placeholder="Location", class="form-control form-select", required=true) }}
+        </div>
+      </div>
+    </div>
+    <h2 class="my-2">Invoice Items</h2>
+    <div id="invoiceItems">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Tool</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Price</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="invoiceItemsBody">
+          {% for form in invoice_item_forms %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ form.tool(placeholder="Name", class="form-control form-select") }}</td>
+            <td>{{ form.quantity(placeholder="Quantity", class="form-control") }}</td>
+            <td>{{ form.price(placeholder="Price", class="form-control") }}</td>
+            <td><button type="button" class="remove-sell-invoice-item-btn btn btn-danger">Remove</button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <button type="button" id="addInvoiceItem" class="btn btn-secondary">Add Item</button>
+  </form>
+</div>
+{% endblock %}

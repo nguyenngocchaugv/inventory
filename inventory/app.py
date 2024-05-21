@@ -20,12 +20,6 @@ from inventory.extensions import (
     migrate,
 )
 
-# Define the custom filter function
-def format_thousands(value):
-    if value is None:
-        return ''
-    return '{:,}'.format(value)
-
 
 def create_app(config_object="inventory.settings"):
     """Create application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.
@@ -37,15 +31,13 @@ def create_app(config_object="inventory.settings"):
     # define the database path to be in the 'db' subfolder
     database_path = os.path.join(os.getcwd(), 'db', 'dev.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + database_path
-    
-    # Register the custom filter function
-    app.jinja_env.filters['format_thousands'] = format_thousands
   
     register_extensions(app)
     register_blueprints(app)
     register_errorhandlers(app)
     register_shellcontext(app)
     register_commands(app)
+    register_filters(app)
     configure_logger(app)
     return app
 
@@ -77,6 +69,7 @@ def register_blueprints(app):
     app.register_blueprint(location.views.blueprint)
     app.register_blueprint(machine.views.blueprint)
     app.register_blueprint(tool.views.blueprint)
+    app.register_blueprint(tool.sell_invoice_views.blueprint)
     return None
 
 
@@ -121,3 +114,13 @@ def configure_logger(app):
     if not app.logger.handlers:
         app.logger.addHandler(handler)
         app.logger.addHandler(file_handler)
+
+def register_filters(app):
+    """Register custom Jinja filters."""
+
+    def format_thousands(value):
+        if value is None:
+            return ''
+        return '{:,}'.format(value)
+
+    app.jinja_env.filters['format_thousands'] = format_thousands
