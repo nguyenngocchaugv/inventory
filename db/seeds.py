@@ -29,7 +29,9 @@ def seed():
     last_name='Admin',
     active=True,
     position='Super Admin',
-    work_duration=8
+    work_duration=8,
+    created_by=1,
+    updated_by=1
   )
   
   super_admin_role = Role.query.filter_by(name='SuperAdmin').first()
@@ -47,7 +49,9 @@ def seed():
     last_name='User',
     active=True,
     position='Admin',
-    work_duration=8
+    work_duration=8,
+    created_by=1,
+    updated_by=1
   )
   admin_role = Role.query.filter_by(name='Admin').first()
   admin_user.role = admin_role
@@ -58,6 +62,10 @@ def seed():
   location_types = ['School', 'Warehouse', 'Supplier']
   
   for location_type_name in location_types:
-    location_type = LocationType(name=location_type_name)
+    location_type = LocationType(
+      name=location_type_name,
+      created_by=1,
+      updated_by=1
+    )
     db.session.add(location_type)
   db.session.commit()

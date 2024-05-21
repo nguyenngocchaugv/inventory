@@ -31,13 +31,15 @@ def sell_invoices():
 @blueprint.route('/<int:sell_invoice_id>', methods=['GET'])
 @login_required
 def view_sell_invoice(sell_invoice_id):
-  # tool = Tool.query.get(sell_invoice_id)
-  # if tool:
-  #   form = ToolForm(obj=tool)
-  #   return render_template('tools/tool.html', tool=tool, form=form, mode='View')
-  # else:
-  #   flash("Tool not found.", "danger")
-    return redirect(url_for('sell_invoices.sell_invoices'))
+  sell_invoice = SellInvoice.query.get(sell_invoice_id)
+  if sell_invoice:
+    form = SellInvoiceForm(obj=sell_invoice)
+    current_app.logger.info(form.data)
+    return render_template('invoices/sell_invoice.html', form=form, mode='View')
+  else:
+    flash("Sell invoice not found.", "danger")
+  return redirect(url_for('sell_invoices.sell_invoices'))
+
 
 @blueprint.route("/new", methods=['GET', 'POST'])
 @login_required
@@ -45,29 +47,16 @@ def new_sell_invoice():
   """Create a new sell invoice."""
   form = SellInvoiceForm(request.form)
   
-   # Get the list of locations from the database that are of type 'School'
-  # locations = [(str(location.id), location.name) for location in Location.query.join(Location.location_type).filter(LocationType.name=='School').all()]
-  # Add a placeholder option with a "-1" value
-  # locations.insert(0, (-1, 'Select a school...'))
-  # form.location.choices = locations
   current_app.logger.info(form.data)
   if form.validate_on_submit():
     if form.location.data == -1:
       flash('Please select a school', 'error')
     else:
-      # Validate each InvoiceItemForm
-      for item_form in form.invoice_item_forms:
-        if not item_form.validate():
-          # If an InvoiceItemForm is not valid, return an error response
-          return jsonify(success=False, errors=item_form.errors)
-        
       # If all InvoiceItemForms are valid, create the sell invoice
       sell_invoice = SellInvoice.create(
         name=form.name.data,
         description=form.description.data,
         issue_date=form.issue_date.data,
-        price=form.price.data,
-        quantity=form.quantity.data,
         location_id=int(form.location.data)
       )
       # Create an invoice item for each InvoiceItemForm
@@ -83,32 +72,19 @@ def new_sell_invoice():
           tool_id=int(item_form.tool.data),
           invoice_id=sell_invoice.id
         )
+        
+        # Reduce the quantity of the tool
+        tool.update(quantity=tool.quantity - item_form.quantity.data)
 
       flash("Sell invoice is created successfully.", "success")
       return redirect(url_for('sell_invoices.sell_invoices'))
-  # else:
-  #   # If the form did not validate, manually repopulate the nested form fields
-  #   for i in range(len(request.form.getlist('invoice_item_forms-tool'))):
-  #     item_form = InvoiceItemForm()
-  #     item_form.tool.data = request.form.getlist('invoice_item_forms-tool')[i]
-  #     item_form.quantity.data = request.form.getlist('invoice_item_forms-quantity')[i]
-  #     item_form.price.data = request.form.getlist('invoice_item_forms-price')[i]
-  #     form.invoice_item_forms.append_entry(item_form)
     flash_errors(form)
   return render_template("invoices/sell_invoice.html", form=form, mode='Create')
 
-@blueprint.route('/get-invoice-item-form', methods=['GET'])
+@blueprint.route('/get-invoice-item-form/<int:row_index>', methods=['GET'])
 @login_required
-def get_invoice_item_form():
-  # Get the list of tools from the database
-  # tools = [(tool.id, tool.name) for tool in Tool.query.order_by(Tool.name).all()]
-  
-    
-  # Add a placeholder option with an empty value
-  # tools.insert(0, ('', 'Select a tool...'))
-  
-  form = InvoiceItemForm()
-  # form.tool.choices = tools  # Populate the tool dropdown
+def get_invoice_item_form(row_index):
+  form = InvoiceItemForm(prefix='invoice_item_forms-' + str(row_index))
   return render_template('invoices/sell_invoice_item_form.html', form=form)
 
 # @blueprint.route("/<int:tool_id>/edit", methods=['GET', 'POST'])

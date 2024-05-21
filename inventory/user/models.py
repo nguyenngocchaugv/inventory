@@ -3,6 +3,7 @@
 import datetime as dt
 
 from flask_login import UserMixin
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from inventory.database import Column, PkModel, db, relationship, reference_col
@@ -13,6 +14,8 @@ class Role(PkModel):
 
     __tablename__ = "roles"
     name = Column(db.String(80), unique=True, nullable=False)
+    
+    __table_args__ = (UniqueConstraint('name', 'is_deleted'),) 
 
     def __init__(self, name, **kwargs):
         """Create instance."""
@@ -51,7 +54,12 @@ class User(UserMixin, PkModel):
     
     role_id = reference_col("roles", nullable=False)
     role = relationship("Role", backref="users")
-
+    
+    __table_args__ = (
+        UniqueConstraint('email', 'is_deleted'),
+        UniqueConstraint('username', 'is_deleted'),
+    )
+    
     @hybrid_property
     def password(self):
         """Hashed password."""

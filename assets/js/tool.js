@@ -42,26 +42,27 @@ $(() => {
   });
 
   // A set to store the IDs of the tools that have been added
-  const addedTools = new Set();
+  // const addedTools = new Set();
+  let rowCount = 0; // The number of rows in the table
 
   // Handle the "Add Item" button
   $('#addInvoiceItem').on('click', () => {
     $.ajax({
-      url: '/sell-invoices/get-invoice-item-form', // The URL of the route that returns a new form
+      url: `/sell-invoices/get-invoice-item-form/${rowCount}`, // The URL of the route that returns a new form
       method: 'GET',
       success(data) {
         // Append the new form to the table
         $('#invoiceItemsBody').append(data);
 
         // Get the select dropdown in the newly added row
-        const select = $('#invoiceItemsBody').find('select:last');
+        // const select = $('#invoiceItemsBody').find('select:last');
 
         // Remove the options for the tools that have been added
-        select.children().each(function selectOption() {
-          if (addedTools.has($(this).val())) {
-            $(this).remove();
-          }
-        });
+        // select.children().each(function selectOption() {
+        //   if (addedTools.has($(this).val())) {
+        //     $(this).remove();
+        //   }
+        // });
 
         // Number the rows
         $('#invoiceItemsBody tr').each((index, row) => {
@@ -69,6 +70,8 @@ $(() => {
         });
       },
     });
+
+    rowCount += 1;
   });
 
   // Handle the "Remove" buttons
@@ -77,18 +80,18 @@ $(() => {
     $(this).parents('tr').remove();
 
     // Remove the tool from the set of added tools
-    addedTools.delete($(this).parents('tr').find('select').val());
+    // addedTools.delete($(this).parents('tr').find('select').val());
   });
 
   // Handle the change event of the tool dropdowns
-  $('#invoiceItemsBody').on('change', 'select', function selectToolDropdownChange() {
-    // Remove the previous value from the set of added tools
-    addedTools.delete($(this).data('previous'));
+  // $('#invoiceItemsBody').on('change', 'select', function selectToolDropdownChange() {
+  //   // Remove the previous value from the set of added tools
+  //   addedTools.delete($(this).data('previous'));
 
-    // Add the new value to the set of added tools
-    addedTools.add($(this).val());
+  //   // Add the new value to the set of added tools
+  //   addedTools.add($(this).val());
 
-    // Update the previous value
-    $(this).data('previous', $(this).val());
-  });
+  //   // Update the previous value
+  //   $(this).data('previous', $(this).val());
+  // });
 });

@@ -13,11 +13,10 @@
         <tr>
           <th>#</th>
           <th>Name</th>
-          <th>Type</th>
-          <th>Model</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Estimate Date</th>
+          <th>Description</th>
+          <th>Issue date</th>
+          <th>Total Price</th>
+          <th>Location</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -26,14 +25,13 @@
         <tr>
           <td>{{ loop.index }}</td>
           <td>{{ invoice.name }}</td>
-          <td>{{ invoice.type }}</td>
-          <td>{{ invoice.model }}</td>
-          <td>{{ invoice.price|format_thousands }}</td>
-          <td>{{ invoice.quantity }}</td>
-          <td>{{ invoice.estimate_date }}</td>
+          <td>{{ invoice.description }}</td>
+          <td>{{ invoice.issue_date.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+          <td>{{ invoice.total_price|format_thousands }}</td>
+          <td>{{ invoice.location.name }}</td>
           <td>
             <a class="btn btn-sm btn-primary"
-              href="{{ url_for('sell_invoice.view_sell_invoice', sell_invoice_id=sell_invoice.id) }}">View</a>
+              href="{{ url_for('sell_invoices.view_sell_invoice', sell_invoice_id=invoice.id) }}">View</a>
           </td>
         </tr>
         {% endfor %}

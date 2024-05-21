@@ -6,6 +6,7 @@ import os
 import click
 from flask.cli import with_appcontext
 from flask import Flask, render_template
+from jinja2 import Undefined
 from sqlalchemy import MetaData
 
 from inventory import commands, public, user, location, machine, tool
@@ -119,7 +120,7 @@ def register_filters(app):
     """Register custom Jinja filters."""
 
     def format_thousands(value):
-        if value is None:
+        if value is None or isinstance(value, Undefined):
             return ''
         return '{:,}'.format(value)
 

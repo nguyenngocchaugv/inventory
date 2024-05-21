@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: c0dc1c5b431c
+Revision ID: 1db59c6f8933
 Revises: 
-Create Date: 2024-05-20 18:23:32.461298
+Create Date: 2024-05-21 22:50:59.789655
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c0dc1c5b431c'
+revision = '1db59c6f8933'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,8 +25,10 @@ def upgrade():
     sa.Column('updated_date', sa.DateTime(), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=True),
     sa.Column('updated_by', sa.Integer(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.UniqueConstraint('name'),
+    sa.UniqueConstraint('name', 'is_deleted')
     )
     op.create_table('machines',
     sa.Column('name', sa.String(length=10), nullable=False),
@@ -41,6 +43,7 @@ def upgrade():
     sa.Column('updated_date', sa.DateTime(), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=True),
     sa.Column('updated_by', sa.Integer(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('roles',
@@ -50,8 +53,10 @@ def upgrade():
     sa.Column('updated_date', sa.DateTime(), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=True),
     sa.Column('updated_by', sa.Integer(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.UniqueConstraint('name'),
+    sa.UniqueConstraint('name', 'is_deleted')
     )
     op.create_table('tools',
     sa.Column('name', sa.String(length=20), nullable=False),
@@ -64,6 +69,7 @@ def upgrade():
     sa.Column('updated_date', sa.DateTime(), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=True),
     sa.Column('updated_by', sa.Integer(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('locations',
@@ -88,9 +94,11 @@ def upgrade():
     sa.Column('updated_date', sa.DateTime(), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=True),
     sa.Column('updated_by', sa.Integer(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['location_type_id'], ['location_types.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.UniqueConstraint('name'),
+    sa.UniqueConstraint('name', 'is_deleted')
     )
     op.create_table('users',
     sa.Column('first_name', sa.String(length=20), nullable=False),
@@ -116,10 +124,13 @@ def upgrade():
     sa.Column('updated_date', sa.DateTime(), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=True),
     sa.Column('updated_by', sa.Integer(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('username')
+    sa.UniqueConstraint('email', 'is_deleted'),
+    sa.UniqueConstraint('username'),
+    sa.UniqueConstraint('username', 'is_deleted')
     )
     op.create_table('rent_invoices',
     sa.Column('name', sa.String(length=10), nullable=False),
@@ -136,6 +147,7 @@ def upgrade():
     sa.Column('updated_date', sa.DateTime(), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=True),
     sa.Column('updated_by', sa.Integer(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['location_id'], ['locations.id'], ),
     sa.ForeignKeyConstraint(['machine_id'], ['machines.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
@@ -151,9 +163,11 @@ def upgrade():
     sa.Column('updated_date', sa.DateTime(), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=True),
     sa.Column('updated_by', sa.Integer(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['location_id'], ['locations.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.UniqueConstraint('name'),
+    sa.UniqueConstraint('name', 'is_deleted')
     )
     op.create_table('invoice_items',
     sa.Column('tool_name', sa.String(length=20), nullable=False),
@@ -168,6 +182,7 @@ def upgrade():
     sa.Column('updated_date', sa.DateTime(), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=True),
     sa.Column('updated_by', sa.Integer(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['invoice_id'], ['sell_invoices.id'], ),
     sa.ForeignKeyConstraint(['tool_id'], ['tools.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -180,6 +195,7 @@ def upgrade():
     sa.Column('updated_date', sa.DateTime(), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=True),
     sa.Column('updated_by', sa.Integer(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['rent_invoice_id'], ['rent_invoices.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

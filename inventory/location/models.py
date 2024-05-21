@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Locations models."""
 
+from sqlalchemy import UniqueConstraint
 from inventory.database import Column, PkModel, db, relationship, reference_col
 
 class Location(PkModel):
@@ -26,7 +27,8 @@ class Location(PkModel):
   
   location_type_id = reference_col("location_types", nullable=False)  
   location_type = relationship("LocationType", backref="locations")
-  is_deleted = Column(db.Boolean, default=False)
+  
+  __table_args__ = (UniqueConstraint('name', 'is_deleted'),) 
 
 class LocationType(PkModel):
   """A location type of the app."""
@@ -34,5 +36,7 @@ class LocationType(PkModel):
   __tablename__ = "location_types"
   
   name = Column(db.String(50), unique=True, nullable=False)
+  
+  __table_args__ = (UniqueConstraint('name', 'is_deleted'),) 
   
  

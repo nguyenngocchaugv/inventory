@@ -23,14 +23,14 @@ blueprint = Blueprint("tool", __name__, url_prefix="/tools", static_folder="../s
 @login_required
 def tools():
   """List tools."""
-  tools = Tool.query.order_by(desc(Tool.id)).all()
+  tools = Tool.query.filter_by(is_deleted=False).order_by(desc(Tool.id)).all()
   return render_template("tools/tools.html", tools=tools)
 
 @blueprint.route('/<int:tool_id>', methods=['GET'])
 @login_required
 def view_tool(tool_id):
   tool = Tool.query.get(tool_id)
-  if tool:
+  if tool and not tool.is_deleted:
     form = ToolForm(obj=tool)
     return render_template('tools/tool.html', tool=tool, form=form, mode='View')
   else:

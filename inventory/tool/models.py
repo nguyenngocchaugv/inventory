@@ -2,6 +2,8 @@
 """Tool models."""
 import datetime as dt
 
+from sqlalchemy import UniqueConstraint, func
+
 from inventory.database import Column, PkModel, db, reference_col, relationship
 
 class Tool(PkModel):
@@ -14,7 +16,6 @@ class Tool(PkModel):
   model = Column(db.String(20), nullable=False)
   price = Column(db.Numeric(precision=10, scale=2), nullable=False)
   quantity = Column(db.Integer, nullable=False)
-  is_deleted = Column(db.Boolean, default=False)
 
 class SellInvoice(PkModel):
   """A sell invoice of the app."""
@@ -27,6 +28,12 @@ class SellInvoice(PkModel):
 
   location_id = reference_col("locations", nullable=False)
   location = relationship("Location", backref="sell_invoices")
+  
+  __table_args__ = (UniqueConstraint('name', 'is_deleted'),)  
+  
+  @property
+  def total_price(self):
+    return db.session.query(func.sum(InvoiceItem.price * InvoiceItem.quantity)).filter(InvoiceItem.invoice_id == self.id).scalar() or 0
   
 class InvoiceItem(PkModel):
   """An item in an invoice."""
@@ -43,3 +50,4 @@ class InvoiceItem(PkModel):
   tool = relationship("Tool", backref="invoice_items")
   
   invoice_id = reference_col("sell_invoices", nullable=False)
+  invoice = relationship("SellInvoice", backref="invoice_items")

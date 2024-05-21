@@ -2,7 +2,8 @@
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
 from typing import Optional, Type, TypeVar
 
-from sqlalchemy import func
+from flask_login import current_user
+from sqlalchemy import func, event
 
 from .compat import basestring
 from .extensions import db
@@ -40,8 +41,9 @@ class CRUDMixin(object):
 
   def delete(self, commit: bool = True) -> None:
     """Remove the record from the database."""
-    db.session.delete(self)
+    self.is_deleted = True
     if commit:
+      db.session.delete(self)
       return db.session.commit()
     return
 
@@ -62,6 +64,8 @@ class PkModel(Model):
   created_by = db.Column(db.Integer, nullable=True)
   updated_by = db.Column(db.Integer, nullable=True)
   
+  is_deleted = Column(db.Boolean, default=False)
+  
   @classmethod
   def get_by_id(cls: Type[T], record_id) -> Optional[T]:
     """Get record by ID."""
@@ -73,6 +77,22 @@ class PkModel(Model):
     ):
       return cls.query.session.get(cls, int(record_id))
     return None
+  
+  @classmethod
+  def __declare_last__(cls):
+    event.listen(cls, 'before_insert', cls.on_before_insert)
+    event.listen(cls, 'before_update', cls.on_before_update)
+
+  @staticmethod
+  def on_before_insert(mapper, connection, target):
+    if not target.created_by:
+      target.created_by = current_user.id if current_user else None
+    target.is_deleted = False
+
+  @staticmethod
+  def on_before_update(mapper, connection, target):
+    if not target.updated_by:
+      target.updated_by = current_user.id if current_user else None
 
 
 def reference_col(
