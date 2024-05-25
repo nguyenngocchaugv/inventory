@@ -14,8 +14,10 @@
         <th>Type</th>
         <th>Serial</th>
         <th>Model</th>
-        <th>Price</th>
+        <th>Price ($)</th>
         <th>Status</th>
+        <th>Created By</th>
+        <th>Updated By</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -28,10 +30,19 @@
         <td>{{ machine.serial }}</td>
         <td>{{ machine.model }}</td>
         <td>{{ machine.price|format_thousands }} $</td>
-        <td>{{ machine.status }}</td>
-        <!-- <td class="{{ 'text-success' if machine.status else 'text-danger' }}">
-          <span class="dot-status"></span> {{ 'Active' if machine.status else 'Inactive' }}
-        </td> -->
+        <td>
+          {% if machine.status == 'AVAILABLE' %}
+            <span class="badge bg-success">{{ machine.status }}</span>
+          {% elif machine.status == 'FIXING' %}
+            <span class="badge bg-warning">{{ machine.status }}</span>
+          {% elif machine.status == 'HIRING' %}
+            <span class="badge bg-primary">{{ machine.status }}</span>
+          {% else %}
+            <span class="badge bg-secondary">{{ machine.status }}</span>
+          {% endif %}
+        </td>
+        <td>{{ machine.created_by_email }}</td>
+        <td>{{ machine.updated_by_email }}</td>
         <td>
           <a class="btn btn-sm btn-primary" href="{{ url_for('machine.view_machine', machine_id=machine.id) }}">View</a>
           <a id="machines-delete-btn" class="btn btn-sm btn-danger"

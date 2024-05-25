@@ -3,7 +3,9 @@
 <div class="container my-4">
   <h3>USERS</h3>
   <div class="d-flex justify-content-end">
-    <a class="btn btn-primary" href="{{ url_for('user.new_user') }}"><i class="fa-solid fa-plus"></i> Add User</a>
+    {% if current_user.role.name == 'SuperAdmin' or current_user.role.name == 'Admin' %}
+      <a class="btn btn-primary" href="{{ url_for('user.new_user') }}"><i class="fa-solid fa-plus"></i> Add User</a>
+    {% endif %}
   </div>
   {% if users %}
   <div class="table-responsive">
@@ -31,16 +33,22 @@
           <td>{{ user.city|default('', true) }}</td>
           <td>{{ user.position|default('', true) }}</td>
           <td>{{ user.role.name}}</td>
-          <td class="{{ 'text-success' if user.status else 'text-danger' }}">
-            <span class="dot-status"></span> {{ 'Active' if user.status else 'Inactive' }}
+          <td class="{{ 'text-success' if user.is_active else 'text-danger' }}">
+            <span class="dot-status"></span> {{ 'Active' if user.is_active else 'Inactive' }}
           </td>
           <td>
             <a class="btn btn-sm btn-primary" href="{{ url_for('user.view_user', user_id=user.id) }}">View</a>
-            <a id="users-delete-btn" class="btn btn-sm btn-danger"
-              data-url="{{ url_for('user.delete_user', user_id=user.id) }}" data-bs-toggle="modal"
-              data-bs-target="#userDeleteModal">
-              Delete
-            </a>
+            {% if current_user.is_authenticated
+              and (current_user.role.name == 'SuperAdmin'
+                    or (current_user.role.name == 'Admin'
+                        and user.role.name != 'Admin' and current_user.id != user.id))
+            %}
+              <a id="users-delete-btn" class="btn btn-sm btn-danger"
+                data-url="{{ url_for('user.delete_user', user_id=user.id) }}" data-bs-toggle="modal"
+                data-bs-target="#userDeleteModal">
+                Delete
+              </a>
+            {% endif %}
           </td>
         </tr>
         {% endfor %}

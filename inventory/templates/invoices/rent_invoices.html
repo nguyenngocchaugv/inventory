@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container my-4">
+  <h3>RENT INVOICES</h3>
+  <div class="d-flex justify-content-end">
+    <a class="btn btn-primary" href="{{ url_for('rent_invoices.new_rent_invoice') }}"><i class="fa-solid fa-plus"></i>
+      Add Rent Invoice</a>
+  </div>
+  {% if rent_invoices %}
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Serial</th>
+          <th>Start date</th>
+          <th>End date</th>
+          <th>Status</th>
+          <th>Location</th>
+          <th>User</th>
+          <th>Machine</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for invoice in rent_invoices %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ invoice.name }}</td>
+          <td>{{ invoice.serial }}</td>
+          <td>{{ invoice.start_date.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+          <td>{{ invoice.end_date.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+          <td>
+            {% if invoice.status == 'ACTIVE' %}
+              <span class="badge bg-success">{{ invoice.status }}</span>
+            {% elif invoice.status == 'CANCELLED' %}
+              <span class="badge bg-danger">{{ invoice.status }}</span>
+            {% elif invoice.status == 'COMPLETED' %}
+              <span class="badge bg-primary">{{ invoice.status }}</span>
+            {% else %}
+              <span class="badge bg-secondary">{{ invoice.status }}</span>
+            {% endif %}
+          </td>
+          <td>{{ invoice.location.name }}</td>
+          <td>{{ invoice.user.email }}</td>
+          <td>
+            <a class="btn btn-sm btn-primary"
+              href="{{ url_for('rent_invoices.view_rent_invoice', rent_invoice_id=invoice.id) }}">View</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <h4 class="text-center m-4">No rent invoices found.</h4>
+  {% endif %}
+</div>
+{% endblock %}

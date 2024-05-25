@@ -73,7 +73,7 @@
       <div class="col-12 col-md-6 mb-3">
         <div class="form-group">
           {{ form.status.label(class="form-label required") }}
-          {{ form.status(placeholder="Status", class="form-control") }}
+          {{ form.status(placeholder="Status", class="form-control form-select", required=mode != 'View', disabled=mode == 'View') }}
         </div>
       </div>
       </div>

@@ -33,8 +33,6 @@ def view_user(user_id):
   
   if user:
     form = UserForm(obj=user)
-    form.role.choices = [(role.id, role.name) for role in Role.query.all() if role.name != 'SuperAdmin']
-    form.role.data = user.role.id  # Set the selected value
     return render_template('users/user.html', user=user, form=form, mode='View')
   else:
     flash("User not found.", "danger")
@@ -64,7 +62,7 @@ def new_user():
       zip_code=form.zip_code.data,
       position=form.position.data,
       work_duration=form.work_duration.data,
-      status=form.status.data == 'True',
+      is_active=form.is_active.data == 'True',
       role_id=form.role.data,
       created_by=current_user.id,
       updated_by=current_user.id
@@ -91,8 +89,6 @@ def edit_user(user_id):
   else:
     form = UserForm(obj=user)
     
-  form.role.choices = [(role.id, role.name) for role in Role.query.all() if role.name != 'SuperAdmin']
-  form.role.data = user.role.id  # Set the selected value
   if form.validate_on_submit():
     user.update( 
       first_name=form.first_name.data,
@@ -109,7 +105,7 @@ def edit_user(user_id):
       zip_code=form.zip_code.data,
       position=form.position.data,
       work_duration=form.work_duration.data,
-      status=form.status.data == 'True',
+      is_active=form.is_active.data == 'True',
       role_id=form.role.data,
       updated_by=current_user.id
     )

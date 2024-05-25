@@ -20,7 +20,10 @@
     <div class="d-flex justify-content-end gap-2 my-4">
       <div>
         {% if mode == 'View' %}
-        <a href="{{ url_for('user.edit_user', user_id=user.id) }}" class="btn btn-primary">Edit</a>
+          {% if current_user.role.name == 'SuperAdmin' or (current_user.role.name == 'Admin'
+                      and user.role.name != 'Admin' and current_user.id != user.id) %}
+            <a href="{{ url_for('user.edit_user', user_id=user.id) }}" class="btn btn-primary">Edit</a>
+          {% endif %}
         {% elif mode == 'Edit' %}
         {{ form.submit(class="btn btn-primary", value="Update") }}
         <a id="user-discard-changes-btn" class="btn btn-danger"
@@ -132,8 +135,8 @@
       </div>
       <div class="col-12 col-md-6 mb-3">
         <div class="form-group">
-          {{ form.status.label(class="form-label required") }}
-          {% for subfield in form.status %}
+          {{ form.is_active.label(class="form-label required") }}
+          {% for subfield in form.is_active %}
           <span class="me-2">{{ subfield(disabled=mode == 'View') }} {{ subfield.label(class="form-label") }}</span>
           {% endfor %}
         </div>

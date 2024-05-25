@@ -69,6 +69,7 @@ def register_blueprints(app):
     app.register_blueprint(user.views.blueprint)
     app.register_blueprint(location.views.blueprint)
     app.register_blueprint(machine.views.blueprint)
+    app.register_blueprint(machine.rent_invoice_views.blueprint)
     app.register_blueprint(tool.views.blueprint)
     app.register_blueprint(tool.sell_invoice_views.blueprint)
     return None

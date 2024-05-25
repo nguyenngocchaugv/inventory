@@ -26,8 +26,8 @@
         <td>{{ location.location_type.name }}</td>
         <td>{{ location.street }}</td>
         <td>{{ location.city }}</td>
-        <td class="{{ 'text-success' if location.status else 'text-danger' }}">
-          <span class="dot-status"></span> {{ 'Active' if location.status else 'Inactive' }}
+        <td class="{{ 'text-success' if location.is_active else 'text-danger' }}">
+          <span class="dot-status"></span> {{ 'Active' if location.is_active else 'Inactive' }}
         </td>
         <td>
           <a class="btn btn-sm btn-primary" href="{{ url_for('location.view_location', location_id=location.id) }}">View</a>

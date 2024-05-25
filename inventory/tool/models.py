@@ -22,7 +22,7 @@ class SellInvoice(PkModel):
 
   __tablename__ = "sell_invoices"
 
-  name = Column(db.String(20), unique=True, nullable=False)
+  name = Column(db.String(20), nullable=False)
   description = Column(db.String(50), nullable=False)
   issue_date = Column(db.DateTime, nullable=False)
 

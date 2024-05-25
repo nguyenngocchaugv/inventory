@@ -44,13 +44,12 @@ class User(UserMixin, PkModel):
     zip_code = Column(db.String(20), nullable=True)
     position = Column(db.String(50), nullable=False)
     work_duration = Column(db.Integer, nullable=False)
-    status = Column(db.Boolean(), default=True)
     
     created_at = Column(
         db.DateTime, nullable=False, default=dt.datetime.now(dt.timezone.utc)
     )
    
-    active = Column(db.Boolean(), default=False)
+    is_active = Column(db.Boolean(), default=True)
     
     role_id = reference_col("roles", nullable=False)
     role = relationship("Role", backref="users")

@@ -23,14 +23,14 @@ blueprint = Blueprint("location", __name__, url_prefix="/locations", static_fold
 @login_required
 def locations():
   """List locations."""
-  locations = Location.query.order_by(desc(Location.id)).all()
+  locations = Location.query.filter_by(is_deleted=False).order_by(desc(Location.id)).all()
   return render_template("locations/locations.html", locations=locations)
 
 @blueprint.route('/<int:location_id>', methods=['GET'])
 @login_required
 def view_location(location_id):
   location = Location.query.get(location_id)
-  if location:
+  if location and not location.is_deleted:
     form = LocationForm(obj=location)
     form.location_type.choices = [(lt.id, lt.name) for lt in LocationType.query.all()]
     form.location_type.data = location.location_type.id  # Set the selected value
@@ -44,7 +44,7 @@ def view_location(location_id):
 def new_location():
   """Create a new location."""
   form = LocationForm(request.form)
-  form.location_type.choices = [(lt.id, lt.name) for lt in LocationType.query.all()]
+  
   if form.validate_on_submit():
     Location.create(
       name=form.name.data,
@@ -61,7 +61,7 @@ def new_location():
       num_f3=form.num_f3.data,
       num_infant=form.num_infant.data,
       office=form.office.data,
-      status=form.status.data == 'True',
+      is_active=form.is_active.data == 'True',
       location_type_id=form.location_type.data
     )
     flash("Location is created successfully.", "success")
@@ -75,19 +75,14 @@ def new_location():
 def edit_location(location_id):
   """View or edit a location."""
   location = Location.query.get(location_id)
-  if not location:
+  if not location or location.is_deleted:
     flash("Location not found.", "danger")
     return redirect(url_for('location.locations'))
 
   if request.method == 'POST':
     form = LocationForm(request.form)
-    
-    current_app.logger.info(location)
   else:
     form = LocationForm(obj=location)
-    
-  form.location_type.choices = [(lt.id, lt.name) for lt in LocationType.query.all()]
-  form.location_type.data = location.location_type.id  # Set the selected value
 
   if form.validate_on_submit():
     location.update( 
@@ -105,7 +100,7 @@ def edit_location(location_id):
       num_f3=form.num_f3.data,
       num_infant=form.num_infant.data,
       office=form.office.data,
-      status=form.status.data == 'True',
+      is_active=form.is_active.data == 'True',
       location_type_id=form.location_type.data
     )
     flash("Location is updated successfully.", "success")

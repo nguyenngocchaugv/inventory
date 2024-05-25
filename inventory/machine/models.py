@@ -10,11 +10,11 @@ class RentInvoice(PkModel):
   
   name = Column(db.String(10), nullable=False)
   serial = Column(db.String(10), nullable=False)
-  est_date = Column(db.DateTime, nullable=False)
+  start_date = Column(db.DateTime, nullable=False)
+  end_date = Column(db.DateTime, nullable=False)
 
   status = Column(db.String(10), nullable=False)
   price = Column(db.Numeric(precision=10, scale=2), nullable=False)
-  type = Column(db.String(10), nullable=False)
   
   location_id = reference_col("locations", nullable=False)
   location = relationship("Location", backref="rent_invoices")
@@ -25,15 +25,15 @@ class RentInvoice(PkModel):
   user_id = reference_col("users", nullable=False)
   user = relationship("User", backref="rent_invoices")
   
-class RentInvoiceDetail(PkModel):
+class RentInvoiceHistory(PkModel):
   """A rent invoice detail of the app."""
 
-  __tablename__ = "rent_invoice_details"
+  __tablename__ = "rent_invoice_histories"
   
   status = Column(db.String(10), nullable=False)
   
   rent_invoice_id = reference_col("rent_invoices", nullable=False)
-  rent_invoice = relationship("RentInvoice", backref="rent_invoice_details") 
+  rent_invoice = relationship("RentInvoice", backref="rent_invoice_histories") 
    
 class Machine(PkModel):
   """A machine of the app."""

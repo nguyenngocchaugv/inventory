@@ -135,8 +135,8 @@
       </div>
       <div class="col-12 col-md-6 mb-3">
         <div class="form-group">
-          {{ form.status.label(class="form-label required") }}
-          {% for subfield in form.status %}
+          {{ form.is_active.label(class="form-label required") }}
+          {% for subfield in form.is_active %}
           <span class="me-2">{{ subfield(disabled=mode == 'View') }} {{ subfield.label(class="form-label") }}</span>
           {% endfor %}
         </div>

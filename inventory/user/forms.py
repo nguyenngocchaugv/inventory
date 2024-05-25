@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import HiddenField, PasswordField, RadioField, SelectField, StringField, SubmitField, ValidationError
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
-from .models import User
+from .models import Role, User
 
 class UserForm(FlaskForm):
   """User form."""
@@ -24,9 +24,17 @@ class UserForm(FlaskForm):
   zip_code = StringField('Zip Code', validators=[Length(max=20)])
   position = StringField('Position', validators=[DataRequired(), Length(max=50)])
   work_duration = StringField('Work Duration', validators=[DataRequired()])
-  status = RadioField('Status', choices=[(True, 'Active'), (False, 'Inactive')], validators=[DataRequired()], default='True')
+  is_active = RadioField('Is Active', choices=[(True, 'Active'), (False, 'Inactive')], validators=[DataRequired()], default='True')
   role = SelectField('Role', coerce=int)
   submit = SubmitField('Submit')
+  
+  def __init__(self, *args, **kwargs):
+    super(UserForm, self).__init__(*args, **kwargs)
+    roles = [(role.id, role.name) for role in Role.query.all() if role.name != 'SuperAdmin']
+    self.role.choices = roles
+    
+    if kwargs.get('obj'):
+      self.role.data = kwargs['obj'].role_id
     
   def validate_username(self, field):
     """Validate username."""

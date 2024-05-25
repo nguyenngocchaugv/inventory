@@ -49,43 +49,41 @@ def new_sell_invoice():
   
   current_app.logger.info(form.data)
   if form.validate_on_submit():
-    if form.location.data == -1:
-      flash('Please select a school', 'error')
-    else:
-      # If all InvoiceItemForms are valid, create the sell invoice
-      sell_invoice = SellInvoice.create(
-        name=form.name.data,
-        description=form.description.data,
-        issue_date=form.issue_date.data,
-        location_id=int(form.location.data)
+    # If all InvoiceItemForms are valid, create the sell invoice
+    sell_invoice = SellInvoice.create(
+      name=form.name.data,
+      description=form.description.data,
+      issue_date=form.issue_date.data,
+      location_id=int(form.location.data)
+    )
+    # Create an invoice item for each InvoiceItemForm
+    for item_form in form.invoice_item_forms:
+      tool = Tool.query.get(item_form.tool.data)
+      
+      InvoiceItem.create(
+        tool_name=tool.name,
+        tool_type=tool.type,
+        tool_model=tool.model,
+        quantity=item_form.quantity.data,
+        price=tool.price,
+        tool_id=int(item_form.tool.data),
+        invoice_id=sell_invoice.id
       )
-      # Create an invoice item for each InvoiceItemForm
-      for item_form in form.invoice_item_forms:
-        tool = Tool.query.get(item_form.tool.data)
-        
-        InvoiceItem.create(
-          tool_name=tool.name,
-          tool_type=tool.type,
-          tool_model=tool.model,
-          quantity=item_form.quantity.data,
-          price=item_form.price.data,
-          tool_id=int(item_form.tool.data),
-          invoice_id=sell_invoice.id
-        )
-        
-        # Reduce the quantity of the tool
-        tool.update(quantity=tool.quantity - item_form.quantity.data)
+      
+      # Reduce the quantity of the tool
+      tool.update(quantity=tool.quantity - item_form.quantity.data)
 
-      flash("Sell invoice is created successfully.", "success")
-      return redirect(url_for('sell_invoices.sell_invoices'))
-    flash_errors(form)
+    flash("Sell invoice is created successfully.", "success")
+    return redirect(url_for('sell_invoices.sell_invoices'))
+  flash_errors(form)
   return render_template("invoices/sell_invoice.html", form=form, mode='Create')
 
 @blueprint.route('/get-invoice-item-form/<int:row_index>', methods=['GET'])
 @login_required
 def get_invoice_item_form(row_index):
   form = InvoiceItemForm(prefix='invoice_item_forms-' + str(row_index))
-  return render_template('invoices/sell_invoice_item_form.html', form=form)
+  form_html = render_template('invoices/sell_invoice_item_form.html', form=form)
+  return jsonify({'form_html': form_html, 'tool_prices': form.tool_prices})
 
 # @blueprint.route("/<int:tool_id>/edit", methods=['GET', 'POST'])
 # @login_required

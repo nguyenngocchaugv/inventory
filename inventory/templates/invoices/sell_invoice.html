@@ -60,7 +60,8 @@
             <th scope="col">#</th>
             <th scope="col">Tool</th>
             <th scope="col">Quantity</th>
-            <th scope="col">Price</th>
+            <th scope="col">Price per unit</th>
+            <th scope="col">Total Price</th>
             {% if mode == 'Create' %}
               <th scope="col">Actions</th>
             {% endif %}
@@ -72,7 +73,8 @@
             <td>{{ loop.index }}</td>
             <td>{{ invoice_item_form.tool(placeholder="Name", class="form-control form-select", disabled=mode == 'View') }}</td>
             <td>{{ invoice_item_form.quantity(placeholder="Quantity", class="form-control", disabled=mode == 'View') }}</td>
-            <td>{{ invoice_item_form.price(placeholder="Price", class="form-control", disabled=mode == 'View') }}</td>
+            <td class="tool-price align-middle"> {{ invoice_item_form.price.data }} </td>
+            <td class="total-price align-middle">{{ (invoice_item_form.quantity.data * invoice_item_form.price.data if invoice_item_form.quantity.data and invoice_item_form.price.data else 0)|format_thousands  }}</td>
             {% if mode == 'Create' %}
               <td><button type="button" class="remove-sell-invoice-item-btn btn btn-danger">Remove</button></td>
             {% endif %}

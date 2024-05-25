@@ -1,3 +1,5 @@
+import { formatThousands } from './script';
+
 $(() => {
   // Delete tool confirmation
   let deleteUrl;
@@ -42,8 +44,8 @@ $(() => {
   });
 
   // A set to store the IDs of the tools that have been added
-  // const addedTools = new Set();
   let rowCount = 0; // The number of rows in the table
+  let toolPrices; // A map of tool IDs to prices
 
   // Handle the "Add Item" button
   $('#addInvoiceItem').on('click', () => {
@@ -51,18 +53,10 @@ $(() => {
       url: `/sell-invoices/get-invoice-item-form/${rowCount}`, // The URL of the route that returns a new form
       method: 'GET',
       success(data) {
+        // Store the tool prices in the toolPrices variable
+        toolPrices = data.tool_prices;
         // Append the new form to the table
-        $('#invoiceItemsBody').append(data);
-
-        // Get the select dropdown in the newly added row
-        // const select = $('#invoiceItemsBody').find('select:last');
-
-        // Remove the options for the tools that have been added
-        // select.children().each(function selectOption() {
-        //   if (addedTools.has($(this).val())) {
-        //     $(this).remove();
-        //   }
-        // });
+        $('#invoiceItemsBody').append(data.form_html);
 
         // Number the rows
         $('#invoiceItemsBody tr').each((index, row) => {
@@ -78,20 +72,36 @@ $(() => {
   $('#invoiceItemsBody').on('click', '.remove-sell-invoice-item-btn', function removeRow() {
     // Remove the parent table row of the button
     $(this).parents('tr').remove();
-
-    // Remove the tool from the set of added tools
-    // addedTools.delete($(this).parents('tr').find('select').val());
   });
 
   // Handle the change event of the tool dropdowns
-  // $('#invoiceItemsBody').on('change', 'select', function selectToolDropdownChange() {
-  //   // Remove the previous value from the set of added tools
-  //   addedTools.delete($(this).data('previous'));
+  $('#invoiceItemsBody').on('change', 'select, .quantity-input', function selectToolDropdownChange() {
+    // Get the row that contains the changed element
+    const row = $(this).closest('tr');
 
-  //   // Add the new value to the set of added tools
-  //   addedTools.add($(this).val());
+    // Get the ID of the selected tool
+    const toolId = row.find('select').val();
 
-  //   // Update the previous value
-  //   $(this).data('previous', $(this).val());
-  // });
+    // Get the price of the selected tool from the toolPrices variable
+    const price = parseFloat(toolPrices[`tool_${toolId}`]);
+    const priceWithTwoDecimals = price.toFixed(2);
+
+    // Set the price in the tool-price field
+    $(this).closest('tr').find('.tool-price').text(priceWithTwoDecimals);
+
+    // Get the quantity
+    const quantity = $(this).closest('tr').find('.quantity-input').val();
+
+    // If either the price or the quantity is not defined, set the total price to zero
+    if (!price || !quantity) {
+      $(this).closest('tr').find('.total-price').text(0);
+      return;
+    }
+
+    // Calculate the total price
+    const totalPrice = price * quantity;
+
+    // Set the text of the total price cell
+    $(this).closest('tr').find('.total-price').text(formatThousands(totalPrice));
+  });
 });

@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from wtforms import DateTimeField, DecimalField, FieldList, FormField, HiddenField, SelectField, StringField, IntegerField, SubmitField, FloatField, ValidationError
 from wtforms.validators import DataRequired, NumberRange
 
+from db.seeds import LocationTypeEnum
 from inventory.location.models import Location, LocationType
 from inventory.tool.models import SellInvoice, Tool
 from inventory.utils import validate_decimal_places
@@ -24,17 +25,25 @@ class ToolForm(FlaskForm):
 class InvoiceItemForm(FlaskForm):
   tool = SelectField('Tool', coerce=str, validators=[DataRequired()])
   quantity = IntegerField('Quantity', validators=[DataRequired()])
-  price = DecimalField('Price', validators=[DataRequired()])
+  price = DecimalField('Price')
+  tool_prices = {}
 
   def __init__(self, *args, **kwargs):
     super(InvoiceItemForm, self).__init__(*args, **kwargs)
-    tools = [(str(t.id), t.name) for t in Tool.query.all()]
+    tools = [(str(t.id), t.name) for t in Tool.query.filter_by(is_deleted=False).all()]
     # Add a placeholder option with an empty value
     tools.insert(0, ('', 'Select a tool...'))
     self.tool.choices = tools
+    # Query the Tool objects again for tool_prices
+    tool_objects = Tool.query.filter_by(is_deleted=False).all()
+    self.tool_prices = {'tool_' + str(tool.id): str(tool.price) for tool in tool_objects}
     
     if kwargs.get('obj'):
       self.tool.data = str(kwargs['obj'].tool_id)
+      # Set the price from the InvoiceItem object instead of the Tool object
+      self.price.data = kwargs['obj'].price
+      self.quantity.data = kwargs['obj'].quantity
+      
   
   # form.tool.choices = tools  # Populate the tool dropdown
   def validate_quantity(self, field):
@@ -49,12 +58,14 @@ class SellInvoiceForm(FlaskForm):
   description = StringField('Description', validators=[DataRequired()])
   issue_date = DateTimeField('Issue Date', format='%Y-%m-%d', validators=[DataRequired()])
   location = SelectField('Location', coerce=str, validators=[DataRequired()])
-  invoice_item_forms = FieldList(FormField(InvoiceItemForm), min_entries=1)
+  invoice_item_forms = FieldList(FormField(InvoiceItemForm))
   submit = SubmitField('Submit')
   
   def __init__(self, *args, **kwargs):
     super(SellInvoiceForm, self).__init__(*args, **kwargs)
-    locations = [(str(location.id), location.name) for location in Location.query.join(Location.location_type).filter(LocationType.name=='School').all()]
+    locations = [(str(location.id), location.name) for location in Location.query
+                 .join(Location.location_type)
+                 .filter(LocationType.name==LocationTypeEnum.SCHOOL.value).all()]
     locations.insert(0, ('', 'Select a school...'))
     self.location.choices = locations
     
@@ -66,6 +77,11 @@ class SellInvoiceForm(FlaskForm):
   def validate(self, extra_validators=None):
     # Call the parent class's validate method
     if not super(SellInvoiceForm, self).validate(extra_validators=extra_validators):
+      return False
+    
+    # Check if at least one item has been added
+    if len(self.invoice_item_forms) == 0:
+      self.invoice_item_forms.errors.append('At least one item must be added to the invoice.')
       return False
 
     # Calculate the total quantity for each tool

@@ -1,7 +1,8 @@
 <tr>
   <td></td> <!-- This cell will be filled in by the JavaScript code -->
   <td>{{ form.tool(placeholder="Name", class="form-control form-select") }}</td>
-  <td>{{ form.quantity(placeholder="Quantity", class="form-control") }}</td>
-  <td>{{ form.price(placeholder="Price", class="form-control") }}</td>
+  <td>{{ form.quantity(placeholder="Quantity", class="form-control quantity-input") }}</td>
+  <td class="tool-price align-middle"></td>
+  <td class="total-price align-middle"></td>
   <td><button type="button" class="remove-sell-invoice-item-btn btn btn-danger">Remove</button></td>
 </tr>
