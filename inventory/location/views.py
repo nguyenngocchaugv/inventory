@@ -64,7 +64,7 @@ def new_location():
       is_active=form.is_active.data == 'True',
       location_type_id=form.location_type.data
     )
-    flash("Location is created successfully.", "success")
+    flash(f"Location {form.name.data} is created successfully.", "success")
     return redirect(url_for('location.locations'))
   else:
     flash_errors(form)
@@ -103,7 +103,7 @@ def edit_location(location_id):
       is_active=form.is_active.data == 'True',
       location_type_id=form.location_type.data
     )
-    flash("Location is updated successfully.", "success")
+    flash(f"Location {form.name.data} is updated successfully.", "success")
     return redirect(url_for('location.view_location', location_id=location.id))
   else:
       flash_errors(form)
@@ -116,7 +116,7 @@ def delete_location(location_id):
   location = Location.query.get(location_id)
   if location:
     Location.delete(location)
-    flash("Location is deleted successfully.", "success")
+    flash(f"Location {location.name} is deleted successfully.", "success")
   else:
     flash("Location not found.", "danger")
   return jsonify({'redirect_url': url_for('location.locations')})

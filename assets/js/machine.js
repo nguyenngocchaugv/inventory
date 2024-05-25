@@ -40,4 +40,20 @@ $(() => {
 
     window.location.href = discardUrl;
   });
+
+  // Discard changes
+  let rentInvoiceDiscardUrl;
+
+  $('#rent-invoice-discard-changes-btn').on('click', (event) => {
+    rentInvoiceDiscardUrl = $(event.currentTarget).data('url');
+  });
+
+  $('#rent-invoice-on-discard-changes-btn').on('click', (event) => {
+    event.preventDefault();
+    if (!rentInvoiceDiscardUrl) {
+      return;
+    }
+
+    window.location.href = rentInvoiceDiscardUrl;
+  });
 });

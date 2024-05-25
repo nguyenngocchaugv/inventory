@@ -67,7 +67,7 @@ def new_user():
       created_by=current_user.id,
       updated_by=current_user.id
     )
-    flash("User is created successfully.", "success")
+    flash(f"User {form.first_name.data} {form.last_name.data} is created successfully.", "success")
     return redirect(url_for('user.users'))
   else:
     flash_errors(form)
@@ -109,7 +109,7 @@ def edit_user(user_id):
       role_id=form.role.data,
       updated_by=current_user.id
     )
-    flash("User is updated successfully.", "success")
+    flash(f"User {user.first_name} {user.last_name} is updated successfully.", "success")
     return redirect(url_for('user.view_user', user_id=user.id))
   else:
       flash_errors(form)
@@ -122,7 +122,7 @@ def delete_user(user_id):
   user = User.query.get(user_id)
   if user:
     User.delete(user)
-    flash("User is deleted successfully.", "success")
+    flash(f"User {user.first_name} {user.last_name} is deleted successfully.", "success")
   else:
     flash("User not found.", "danger")
   return jsonify({'redirect_url': url_for('user.users')})

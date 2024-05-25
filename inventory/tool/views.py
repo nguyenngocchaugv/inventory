@@ -52,7 +52,7 @@ def new_tool():
       price=form.price.data,
       quantity=form.quantity.data,
     )
-    flash("Tool is created successfully.", "success")
+    flash(f"Tool {form.name.data} is created successfully.", "success")
     return redirect(url_for('tool.tools'))
   else:
     flash_errors(form)
@@ -80,7 +80,7 @@ def edit_tool(tool_id):
       price=form.price.data,
       quantity=form.quantity.data,
     )
-    flash("Tool is updated successfully.", "success")
+    flash(f"Tool {form.name.data} is updated successfully.", "success")
     return redirect(url_for('tool.view_tool', tool_id=tool.id))
   else:
       flash_errors(form)
@@ -93,7 +93,7 @@ def delete_tool(tool_id):
   tool = Tool.query.get(tool_id)
   if tool:
     Tool.delete(tool)
-    flash("Tool is deleted successfully.", "success")
+    flash(f"The tool {tool.name} is deleted successfully.", "success")
   else:
     flash("Tool not found.", "danger")
   return jsonify({'redirect_url': url_for('tool.tools')})

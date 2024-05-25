@@ -9,12 +9,11 @@ from flask import (
   url_for,
   request
 )
-from sqlalchemy.orm import joinedload
 from flask import current_app
 from flask_login import login_required
 from sqlalchemy import desc
 from inventory.location.models import Location, LocationType
-from inventory.machine.forms import MachineStatus, RentInvoiceForm
+from inventory.machine.forms import MachineStatusEnum, RentInvoiceEditForm, RentInvoiceForm, RentInvoiceStatusEnum
 from inventory.machine.models import Machine, RentInvoice, RentInvoiceHistory
 from inventory.utils import flash_errors
 
@@ -36,7 +35,7 @@ def view_rent_invoice(rent_invoice_id):
     form = RentInvoiceForm(obj=rent_invoice)
     return render_template('invoices/rent_invoice.html', form=form, mode='View')
   else:
-    flash(f"Rent invoice {rent_invoice_id} not found.", "danger")
+    flash(f"Rent invoice not found.", "danger")
   return redirect(url_for('rent_invoices.rent_invoices'))
 
 
@@ -62,7 +61,7 @@ def new_rent_invoice():
     
     # Update machine status
     machine = Machine.query.get(int(form.machine.data))
-    machine.update(status=MachineStatus.HIRING.value)
+    machine.update(status=MachineStatusEnum.HIRING.value)
     
     # Create a rent invoice history
     RentInvoiceHistory.create(
@@ -75,9 +74,37 @@ def new_rent_invoice():
   flash_errors(form)
   return render_template("invoices/rent_invoice.html", form=form, mode='Create')
 
-# @blueprint.route('/get-invoice-item-form/<int:row_index>', methods=['GET'])
-# @login_required
-# def get_invoice_item_form(row_index):
-#   form = InvoiceItemForm(prefix='invoice_item_forms-' + str(row_index))
-#   form_html = render_template('invoices/sell_invoice_item_form.html', form=form)
-#   return jsonify({'form_html': form_html, 'tool_prices': form.tool_prices})
+@blueprint.route("/<int:rent_invoice_id>/edit", methods=['GET', 'POST'])
+@login_required
+def edit_rent_invoice_status(rent_invoice_id):
+  """View or edit a rent invoice status."""
+  rent_invoice = RentInvoice.query.get(rent_invoice_id)
+  if not rent_invoice:
+    flash("Rent Invoice not found.", "danger")
+    return redirect(url_for('rent_invoices.rent_invoices'))
+
+  if request.method == 'POST':
+    current_app.logger.info(request.form)
+    form = RentInvoiceEditForm(request.form, obj=rent_invoice)
+  else:
+    form = RentInvoiceEditForm(obj=rent_invoice)
+
+  if form.validate_on_submit():
+    old_status = rent_invoice.status
+    new_status = form.status.data
+     # Update the status of the rent invoice
+    rent_invoice.update(status=new_status)
+    
+    # If the status has changed from 'ACTIVE' to either 'CANCELLED' or 'COMPLETED',
+    # update the status of the machine to 'AVAILABLE'
+    if old_status == RentInvoiceStatusEnum.ACTIVE.value and new_status in [RentInvoiceStatusEnum.CANCELLED.value, RentInvoiceStatusEnum.COMPLETED.value]:
+      machine = Machine.query.get(rent_invoice.machine_id)
+      if machine:
+        machine.update(status=MachineStatusEnum.AVAILABLE.value)
+        
+    flash(f"Rent invoice {rent_invoice.name} is updated successfully.", "success")
+    return redirect(url_for('rent_invoices.view_rent_invoice', rent_invoice_id=rent_invoice.id))
+  else:
+    flash_errors(form)
+
+  return render_template("invoices/rent_invoice.html", form=form, mode='Edit')

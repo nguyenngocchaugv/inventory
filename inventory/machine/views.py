@@ -12,7 +12,7 @@ from flask import (
 from flask import current_app
 from flask_login import login_required
 from sqlalchemy import desc
-from inventory.machine.forms import MachineForm, MachineStatus, RentInvoiceStatusEnum
+from inventory.machine.forms import MachineForm, MachineStatusEnum, RentInvoiceStatusEnum
 from inventory.machine.models import Machine, RentInvoice, RentInvoiceHistory
 from inventory.user.models import User
 from inventory.utils import flash_errors
@@ -98,7 +98,7 @@ def edit_machine(machine_id):
     )
     
      # Check if the status has changed from FIXING to HIRING or vice versa
-    statuses = [MachineStatus.FIXING.value, MachineStatus.HIRING.value]
+    statuses = [MachineStatusEnum.FIXING.value, MachineStatusEnum.HIRING.value]
      
     if old_status in statuses and form.status.data in statuses and old_status != form.status.data:
       # Get the RentInvoice with ACTIVE status and machine_id
