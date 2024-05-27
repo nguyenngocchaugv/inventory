@@ -8,6 +8,7 @@
 require('@fortawesome/fontawesome-free');
 require('jquery');
 require('bootstrap');
+require('chart.js');
 
 require.context(
   '../img', // context folder
@@ -22,3 +23,4 @@ require('./location');
 require('./machine');
 require('./tool');
 require('./user');
+require('./dashboard');

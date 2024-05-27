@@ -85,7 +85,6 @@ def edit_machine(machine_id):
     form = MachineForm(request.form, obj=machine)
   else:
     form = MachineForm(obj=machine)
-  current_app.logger.info(form.data)
   if form.validate_on_submit():
     machine.update( 
       name=form.name.data,

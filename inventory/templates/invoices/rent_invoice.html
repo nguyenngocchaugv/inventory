@@ -23,7 +23,7 @@
       <div>
         {{ form.submit(class="btn btn-primary", value="Submit") }}
       </div>
-      {% elif mode == 'View' %}
+      {% elif mode == 'View' and form.status.data == 'ACTIVE' %}
         <a href="{{ url_for('rent_invoices.edit_rent_invoice_status', rent_invoice_id=form.id.data) }}"
           class="btn btn-primary">Edit</a>
       {% elif mode == 'Edit' %}

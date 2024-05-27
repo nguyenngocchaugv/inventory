@@ -34,7 +34,6 @@ def view_sell_invoice(sell_invoice_id):
   sell_invoice = SellInvoice.query.get(sell_invoice_id)
   if sell_invoice:
     form = SellInvoiceForm(obj=sell_invoice)
-    current_app.logger.info(form.data)
     return render_template('invoices/sell_invoice.html', form=form, mode='View')
   else:
     flash("Sell invoice not found.", "danger")

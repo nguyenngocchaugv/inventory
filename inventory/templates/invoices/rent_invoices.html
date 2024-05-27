@@ -20,6 +20,7 @@
           <th>Location</th>
           <th>User</th>
           <th>Machine</th>
+          <th>Machine Status</th>
         </tr>
       </thead>
       <tbody>
@@ -28,8 +29,8 @@
           <td>{{ loop.index }}</td>
           <td>{{ invoice.name }}</td>
           <td>{{ invoice.serial }}</td>
-          <td>{{ invoice.start_date.strftime('%d/%m/%Y %H:%M:%S') }}</td>
-          <td>{{ invoice.end_date.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+          <td>{{ invoice.start_date.strftime('%d/%m/%Y') }}</td>
+          <td>{{ invoice.end_date.strftime('%d/%m/%Y') }}</td>
           <td>
             {% if invoice.status == 'ACTIVE' %}
               <span class="badge bg-success">{{ invoice.status }}</span>
@@ -43,6 +44,22 @@
           </td>
           <td>{{ invoice.location.name }}</td>
           <td>{{ invoice.user.email }}</td>
+          <td>{{ invoice.machine.name }}</td>
+          <td>
+            {% if invoice.status == 'ACTIVE' %}
+              {% if invoice.machine.status == 'AVAILABLE' %}
+              <span class="badge bg-success">{{ invoice.machine.status }}</span>
+              {% elif invoice.machine.status == 'FIXING' %}
+                <span class="badge bg-warning">{{ invoice.machine.status }}</span>
+              {% elif invoice.machine.status == 'HIRING' %}
+                <span class="badge bg-primary">{{ invoice.machine.status }}</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ invoice.machine.status }}</span>
+              {% endif %}
+            {% else %}
+              <span class="badge bg-secondary">Previously hired</span>
+            {% endif %}
+          </td>
           <td>
             <a class="btn btn-sm btn-primary"
               href="{{ url_for('rent_invoices.view_rent_invoice', rent_invoice_id=invoice.id) }}">View</a>

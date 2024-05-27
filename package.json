@@ -31,9 +31,10 @@
   "homepage": "https://github.com/chau.nguyen/inventory#readme",
   "dependencies": {
     "@fortawesome/fontawesome-free": "6.5.2",
+    "@popperjs/core": "2.11.8",
     "bootstrap": "5.3.3",
-    "jquery": "3.7.1",
-    "@popperjs/core": "2.11.8"
+    "chart.js": "4.4.3",
+    "jquery": "3.7.1"
   },
   "devDependencies": {
     "@babel/core": "7.24.4",

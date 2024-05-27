@@ -32,7 +32,7 @@ def rent_invoices():
 def view_rent_invoice(rent_invoice_id):
   rent_invoice = RentInvoice.query.get(rent_invoice_id)
   if rent_invoice:
-    form = RentInvoiceForm(obj=rent_invoice)
+    form = RentInvoiceEditForm(obj=rent_invoice)
     return render_template('invoices/rent_invoice.html', form=form, mode='View')
   else:
     flash(f"Rent invoice not found.", "danger")
@@ -45,8 +45,13 @@ def new_rent_invoice():
   """Create a new rent invoice."""
   form = RentInvoiceForm(request.form)
   
-  current_app.logger.info(form.data)
   if form.validate_on_submit():
+    # Check machine status
+    machine = Machine.query.get(int(form.machine.data))
+    if machine.status != MachineStatusEnum.AVAILABLE.value:
+      flash(f"Machine {machine.name} is currently not available for hire.", "danger")
+      return render_template("invoices/rent_invoice.html", form=form, mode='Create')
+    
     rent_invoice = RentInvoice.create(
       name=form.name.data,
       serial=form.serial.data,

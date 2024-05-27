@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container my-4">
+  <h3>DASHBOARD</h3>
+  <div class="row mt-4 d-flex align-items-stretch">
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Rent Invoice Revenue</h5>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <select id="rentInvoiceYearSelect" class="form-select" style="width: auto;">
+              <!-- The year options will be added here by JavaScript -->
+            </select>
+          </div>
+          <canvas id="rent-invoice-revenue-chart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Top 10 Selling Tools</h5>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <select id="sellInvoiceYearSelect" class="form-select" style="width: auto;">
+              <!-- The year options will be added here by JavaScript -->
+            </select>
+          </div>
+          <canvas id="top-selling-tools-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4 d-flex align-items-stretch">
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Machine Status Count</h5>
+          <canvas id="machine-status-count-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Rent Invoice Status Count</h5>
+          <canvas id="rent-invoice-status-count-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4 d-flex align-items-stretch">
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Top 10 Spending School</h5>
+          <canvas id="top-10-spending-school-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

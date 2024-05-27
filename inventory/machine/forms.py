@@ -3,7 +3,7 @@
 from flask import current_app
 from flask_wtf import FlaskForm
 from sqlalchemy import and_
-from wtforms import DateTimeField, HiddenField, SelectField, StringField, IntegerField, SubmitField, FloatField, ValidationError, TextAreaField
+from wtforms import DateTimeField, HiddenField, SelectField, StringField, SubmitField, FloatField, ValidationError, TextAreaField
 from wtforms.validators import DataRequired
 from enum import Enum
 
@@ -31,7 +31,7 @@ class RentInvoiceForm(FlaskForm):
   start_date = DateTimeField('Start Date', format='%Y-%m-%d', validators=[DataRequired()])
   end_date = DateTimeField('End Date', format='%Y-%m-%d', validators=[DataRequired()])
   status = SelectField('Status',
-                       choices=[(status.value, status.value) for status in RentInvoiceStatusEnum],
+                       choices=[(RentInvoiceStatusEnum.ACTIVE.value, RentInvoiceStatusEnum.ACTIVE.value)],
                        default=RentInvoiceStatusEnum.ACTIVE.value,
                        render_kw={'disabled': True})
   price = FloatField('Price', validators=[DataRequired(), validate_decimal_places])
@@ -59,38 +59,14 @@ class RentInvoiceForm(FlaskForm):
                 .filter(and_(Machine.status==MachineStatusEnum.AVAILABLE.value, Machine.is_deleted == False)).all()]
     machines.insert(0, ('', 'Select a machine...'))
     self.machine.choices = machines
-    current_app.logger.info(self.machine.choices)
-    
-    
-    # Set the choices for the status field based on the current status of the invoice
-    # current_app.logger.info(kwargs.field)
-    # in case of editing an existing invoice, the status field should be enabled
-    # if kwargs.get('obj') and kwargs['obj'].status == RentInvoiceStatusEnum.ACTIVE.value:
-    #   self.status.choices = [(status.value, status.value) for status in [RentInvoiceStatusEnum.COMPLETED, RentInvoiceStatusEnum.CANCELLED]]
-    #   # self.status.render_kw = {'disabled': False}
-    # else:
-    #   self.status.choices = [(RentInvoiceStatusEnum.ACTIVE.value, RentInvoiceStatusEnum.ACTIVE.value)]
-    #   # self.status.render_kw = {'disabled': True}
-    # current_app.logger.info(self.status.choices)
-    
-     # Set the choices for the status field based on the mode
-    # if mode == 'Create':
-    #   self.status.choices = [(RentInvoiceStatusEnum.ACTIVE.value, RentInvoiceStatusEnum.ACTIVE.value)]
-    # elif mode == 'View':
-    #   self.status.choices = [(status.value, status.value) for status in RentInvoiceStatusEnum]
-    # elif mode == 'Edit':
-    #   self.status.choices = [(status.value, status.value) for status in RentInvoiceStatusEnum]
     
      # Set the default value for the location dropdown
     if kwargs.get('obj'):
       self.status.choices = [(RentInvoiceStatusEnum.ACTIVE.value, RentInvoiceStatusEnum.ACTIVE.value)]
       self.location.data = str(kwargs['obj'].location_id)
       self.user.data = str(kwargs['obj'].user_id)
-      
-      # machine = Machine.query.get(kwargs['obj'].machine_id)
-      # self.machine.choices = [(str(machine.id), machine.name)]
-      
       self.machine.data = str(kwargs['obj'].machine_id)
+
   def validate_end_date(self, field):
     if self.start_date.data and field.data:
       if field.data < self.start_date.data:
@@ -130,6 +106,12 @@ class RentInvoiceEditForm(FlaskForm):
       self.user.data = str(kwargs['obj'].user_id)
       self.machine.data = str(kwargs['obj'].machine_id)
       
+  def validate_status(self, field):
+    if field.data in [RentInvoiceStatusEnum.COMPLETED.value, RentInvoiceStatusEnum.CANCELLED.value]:
+      machine = Machine.query.get(int(self.machine.data))
+      if machine.status == MachineStatusEnum.FIXING.value:
+        raise ValidationError("Machine is currently in fixing status. Cannot change rent invoice status.")
+      
 class MachineForm(FlaskForm):
   """Machine form."""
   id = HiddenField()
@@ -149,15 +131,11 @@ class MachineForm(FlaskForm):
     if kwargs.get('obj'):
       if kwargs['obj'].status == MachineStatusEnum.AVAILABLE.value:
         self.status.choices = [(MachineStatusEnum.AVAILABLE.value, MachineStatusEnum.AVAILABLE.value)]
-        # self.status.render_kw = {'disabled': True}
       elif kwargs['obj'].status in [MachineStatusEnum.HIRING.value, MachineStatusEnum.FIXING.value]:
         self.status.choices = [(status.value, status.value) for status in [MachineStatusEnum.HIRING, MachineStatusEnum.FIXING]]
-        # self.status.render_kw = {'disabled': False}
     else:
       self.status.choices = [(MachineStatusEnum.AVAILABLE.value, MachineStatusEnum.AVAILABLE.value)]
       self.status.default=MachineStatusEnum.AVAILABLE.value
-      # self.status.render_kw = {'disabled': True}
-    current_app.logger.info(self.status.choices)
   
   
   def validate(self, **kwargs):
