@@ -66,7 +66,7 @@ class TestLoginForm:
 
     def test_validate_inactive_user(self, user):
         """Inactive user."""
-        user.active = False
+        user.is_active = False
         user.save()
         # Correct username and password, but user is not activated
         form = LoginForm(username=user.username, password="myprecious")
