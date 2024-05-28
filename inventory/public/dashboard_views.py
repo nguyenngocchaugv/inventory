@@ -26,6 +26,7 @@ blueprint = Blueprint("dashboard", __name__, static_folder="../static")
 
 
 @blueprint.route("/dashboard", methods=["GET", "POST"])
+@login_required
 def dashboard():
   """Dashboard page."""
   return render_template("public/dashboard.html")

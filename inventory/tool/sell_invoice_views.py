@@ -46,7 +46,6 @@ def new_sell_invoice():
   """Create a new sell invoice."""
   form = SellInvoiceForm(request.form)
   
-  current_app.logger.info(form.data)
   if form.validate_on_submit():
     # If all InvoiceItemForms are valid, create the sell invoice
     sell_invoice = SellInvoice.create(

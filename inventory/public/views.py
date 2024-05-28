@@ -7,9 +7,10 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
-from flask_login import login_required, login_user, logout_user
+from flask_login import current_user, login_required, login_user, logout_user
 
 from inventory.extensions import login_manager
 from inventory.public.forms import LoginForm
@@ -50,6 +51,35 @@ def logout():
     logout_user()
     flash("You are logged out.", "info")
     return redirect(url_for("public.home"))
+
+@blueprint.route("/login/", methods=["GET", "POST"])
+def login():
+    """Login page."""
+    # If the user is already authenticated, redirect them to the dashboard
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard.dashboard'))
+    # Store the next URL in the session
+    session['next'] = request.args.get('next')
+    current_app.logger.info(request.args.get('next'))
+    current_app.logger.info(request.form)
+
+    form = LoginForm(request.form)
+    # Check the form is valid on submission (i.e., we're in a POST request)
+    if form.validate_on_submit():
+        # Log in the user
+        login_user(form.user)
+        flash("You are logged in.", "success")
+        # If login successful, redirect to next URL or default URL
+        next_page = session.get('next', '/')
+        session['next'] = None  # clear the next URL stored in the session
+        return redirect(next_page)
+    else:
+        flash_errors(form)
+    return render_template("public/login.html", form=form)
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return redirect(url_for('public.login', next=request.url))
 
 
 @blueprint.route("/register/", methods=["GET", "POST"])
