@@ -11,7 +11,8 @@ from flask import (
 )
 from flask import current_app
 from flask_login import current_user, login_required
-from sqlalchemy import desc
+from sqlalchemy import and_, desc
+from db.seeds import RoleEnum
 from inventory.user.forms import UserForm
 from inventory.user.models import Role, User
 from inventory.utils import flash_errors
@@ -23,8 +24,18 @@ blueprint = Blueprint("user", __name__, url_prefix="/users", static_folder="../s
 @login_required
 def users():
   """List users."""
-  users = User.query.join(User.role).filter(Role.name != 'SuperAdmin').order_by(desc(User.id)).all()
+  users = User.query.join(User.role).filter(Role.name != RoleEnum.SUPER_ADMIN.value).order_by(desc(User.id)).all()
   return render_template("users/users.html", users=users)
+
+@blueprint.route("/search", methods=["GET"])
+def search():
+  """Search users."""
+  search_term = request.args.get('q', '')
+  if search_term == '':  # Show all users if no search term
+    return redirect(url_for('user.users'))
+  
+  users = User.query.join(User.role).filter(and_(Role.name != RoleEnum.SUPER_ADMIN.value, User.email.contains(search_term))).order_by(desc(User.id)).all()
+  return render_template("users/users.html", users=users, search_term=search_term)
 
 @blueprint.route('/<int:user_id>', methods=['GET'])
 @login_required

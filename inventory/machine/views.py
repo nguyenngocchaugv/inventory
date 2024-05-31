@@ -35,6 +35,24 @@ def machines():
     
   return render_template("machines/machines.html", machines=machines)
 
+@blueprint.route("/search", methods=["GET"])
+def search():
+  """Search machines."""
+  search_term = request.args.get('q', '')
+  if search_term == '':  # Show all machines if no search term
+    return redirect(url_for('machine.machines'))
+  
+  machines = Machine.query.filter_by(is_deleted=False).filter(Machine.name.contains(search_term)).order_by(desc(Machine.id)).all()
+  
+  # Query the User table and create a dictionary where the keys are user IDs and the values are user emails
+  users = {user.id: user.email for user in User.query.all()}
+  # For each machine, get the emails of the users who created and updated it from the dictionary
+  for machine in machines:  
+    machine.created_by_email = users.get(machine.created_by)
+    machine.updated_by_email = users.get(machine.updated_by)
+    
+  return render_template("machines/machines.html", machines=machines, search_term=search_term)
+
 @blueprint.route('/<int:machine_id>', methods=['GET'])
 @login_required
 def view_machine(machine_id):

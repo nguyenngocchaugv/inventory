@@ -9,7 +9,6 @@ from flask import (
   url_for,
   request
 )
-from flask import current_app
 from flask_login import login_required
 from sqlalchemy import desc
 from inventory.location.forms import LocationForm
@@ -25,6 +24,16 @@ def locations():
   """List locations."""
   locations = Location.query.filter_by(is_deleted=False).order_by(desc(Location.id)).all()
   return render_template("locations/locations.html", locations=locations)
+
+@blueprint.route("/search", methods=["GET"])
+def search():
+  """Search locations."""
+  search_term = request.args.get('q', '')
+  if search_term == '':  # Show all locations if no search term
+    return redirect(url_for('location.locations'))
+  
+  locations = Location.query.filter_by(is_deleted=False).filter(Location.name.contains(search_term)).order_by(desc(Location.id)).all()
+  return render_template("locations/locations.html", locations=locations, search_term=search_term)
 
 @blueprint.route('/<int:location_id>', methods=['GET'])
 @login_required

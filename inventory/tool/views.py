@@ -26,6 +26,16 @@ def tools():
   tools = Tool.query.filter_by(is_deleted=False).order_by(desc(Tool.id)).all()
   return render_template("tools/tools.html", tools=tools)
 
+@blueprint.route("/search", methods=["GET"])
+def search():
+  """Search tools."""
+  search_term = request.args.get('q', '')
+  if search_term == '':  # Show all tools if no search term
+    return redirect(url_for('tool.tools'))
+  
+  tools = Tool.query.filter_by(is_deleted=False).filter(Tool.name.contains(search_term)).order_by(desc(Tool.id)).all()
+  return render_template("tools/tools.html", tools=tools, search_term=search_term)
+
 @blueprint.route('/<int:tool_id>', methods=['GET'])
 @login_required
 def view_tool(tool_id):

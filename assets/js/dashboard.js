@@ -14,42 +14,47 @@ $(() => {
     const option = document.createElement('option');
     option.value = year;
     option.text = year;
-    rentInvoiceYearSelect.appendChild(option);
+    rentInvoiceYearSelect?.appendChild(option);
   });
 
-  const rentInvoiceRevenueCtx = document.getElementById('rent-invoice-revenue-chart').getContext('2d');
-  let rentInvoiceRevenueChart;
+  const rentInvoiceRevenueCtx = document.getElementById('rent-invoice-revenue-chart')?.getContext('2d');
+  if (!rentInvoiceRevenueCtx) {
+    return;
+  }
+  // Initialize the chart with empty data
+  const rentInvoiceRevenueChart = new Chart(rentInvoiceRevenueCtx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Total Revenue',
+        data: [],
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1,
+      }],
+    },
+    options: {
+      scales: {
+        x: {
+          beginAtZero: true,
+        },
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
 
   $('#rentInvoiceYearSelect').on('change', () => {
     const year = $('#rentInvoiceYearSelect').val();
     $.getJSON(`/dashboard/rent-invoice-revenue/${year}`, (data) => {
-      if (rentInvoiceRevenueChart) {
-        rentInvoiceRevenueChart.destroy();
-      }
+      // Update the chart data
+      rentInvoiceRevenueChart.data.labels = data.labels;
+      rentInvoiceRevenueChart.data.datasets[0].data = data.data;
 
-      rentInvoiceRevenueChart = new Chart(rentInvoiceRevenueCtx, {
-        type: 'line',
-        data: {
-          labels: data.labels,
-          datasets: [{
-            label: 'Total Revenue',
-            data: data.data,
-            fill: false,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1,
-          }],
-        },
-        options: {
-          scales: {
-            x: {
-              beginAtZero: true,
-            },
-            y: {
-              beginAtZero: true,
-            },
-          },
-        },
-      });
+      // Re-render the chart
+      rentInvoiceRevenueChart.update();
     });
   });
 
@@ -59,42 +64,48 @@ $(() => {
   /** SELL REVENUE */
   // Create a dropdown option for each year
   const sellInvoiceYearSelect = document.getElementById('sellInvoiceYearSelect');
+  if (!sellInvoiceYearSelect) {
+    return;
+  }
+
   years.forEach((year) => {
     const option = document.createElement('option');
     option.value = year;
     option.text = year;
-    sellInvoiceYearSelect.appendChild(option);
+    sellInvoiceYearSelect?.appendChild(option);
   });
 
   const topSellingToolsCtx = document.getElementById('top-selling-tools-chart').getContext('2d');
-  let topSellingToolsChart;
+  const topSellingToolsChart = new Chart(topSellingToolsCtx, {
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Total Revenue',
+        data: [],
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgb(75, 192, 192)',
+        borderWidth: 1,
+      }],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
 
   $('#sellInvoiceYearSelect').on('change', () => {
     const year = $('#sellInvoiceYearSelect').val();
     $.getJSON(`/dashboard/top-selling-tools/${year}`, (data) => {
-      if (topSellingToolsChart) {
-        topSellingToolsChart.destroy();
-      }
-      topSellingToolsChart = new Chart(topSellingToolsCtx, {
-        type: 'bar',
-        data: {
-          labels: data.labels,
-          datasets: [{
-            label: 'Total Revenue',
-            data: data.data,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgb(75, 192, 192)',
-            borderWidth: 1,
-          }],
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true,
-            },
-          },
-        },
-      });
+      // Update the chart data
+      topSellingToolsChart.data.labels = data.labels;
+      topSellingToolsChart.data.datasets[0].data = data.data;
+
+      // Re-render the chart
+      topSellingToolsChart.update();
     });
   });
 
@@ -102,6 +113,10 @@ $(() => {
 
   /** MACHINE STATUS COUNT */
   const machineStatusCountCtx = document.getElementById('machine-status-count-chart').getContext('2d');
+  if (!machineStatusCountCtx) {
+    return;
+  }
+
   let machineStatusCountChart;
 
   // Fetch the machine status counts from your server
@@ -134,14 +149,18 @@ $(() => {
   });
 
   /** RENT INVOICE STATUS COUNT */
-  const rentInvoiceStatusCountCtx = document.getElementById('rent-invoice-status-count-chart').getContext('2d');
+  const rentInvoiceStatusCountCtx = document.getElementById('rent-invoice-status-count-chart')?.getContext('2d');
+  if (!rentInvoiceStatusCountCtx) {
+    return;
+  }
+
   let rentInvoiceStatusCountChart;
   $.getJSON('/dashboard/rent-invoice-status-count/', (rentInvoiceStatusCounts) => {
     if (rentInvoiceStatusCountChart) {
       rentInvoiceStatusCountChart.destroy();
     }
 
-    rentInvoiceRevenueChart = new Chart(rentInvoiceStatusCountCtx, {
+    rentInvoiceStatusCountChart = new Chart(rentInvoiceStatusCountCtx, {
       type: 'bar',
       data: {
         labels: rentInvoiceStatusCounts.labels,
@@ -172,7 +191,11 @@ $(() => {
   });
 
   /** TOP 10 SPENDING SCHOOL CHART */
-  const topSpendingSchoolCtx = document.getElementById('top-10-spending-school-chart').getContext('2d');
+  const topSpendingSchoolCtx = document.getElementById('top-10-spending-school-chart')?.getContext('2d');
+  if (!topSpendingSchoolCtx) {
+    return;
+  }
+
   let topSpendingSchoolChart;
 
   $.getJSON('/dashboard/top-10-spending-school/', (topSpendingSchool) => {

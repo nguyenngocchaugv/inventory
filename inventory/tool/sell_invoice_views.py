@@ -9,12 +9,10 @@ from flask import (
   url_for,
   request
 )
-from sqlalchemy.orm import joinedload
-from flask import current_app
 from flask_login import login_required
 from sqlalchemy import desc
-from inventory.location.models import Location, LocationType
-from inventory.tool.forms import InvoiceItemForm, SellInvoiceForm, ToolForm
+
+from inventory.tool.forms import InvoiceItemForm, SellInvoiceForm
 from inventory.tool.models import InvoiceItem, SellInvoice, Tool
 from inventory.utils import flash_errors
 
@@ -27,6 +25,16 @@ def sell_invoices():
   """List sell_invoices."""
   sell_invoices = SellInvoice.query.order_by(desc(SellInvoice.id)).all()
   return render_template("invoices/sell_invoices.html", sell_invoices=sell_invoices)
+
+@blueprint.route("/search", methods=["GET"])
+def search():
+  """Search sell invoices."""
+  search_term = request.args.get('q', '')
+  if search_term == '':  # Show all sell invoices if no search term
+    return redirect(url_for('sell_invoices.sell_invoices'))
+  
+  sell_invoices = SellInvoice.query.filter(SellInvoice.name.contains(search_term)).order_by(desc(SellInvoice.id)).all()
+  return render_template("invoices/sell_invoices.html", sell_invoices=sell_invoices, search_term=search_term)
 
 @blueprint.route('/<int:sell_invoice_id>', methods=['GET'])
 @login_required

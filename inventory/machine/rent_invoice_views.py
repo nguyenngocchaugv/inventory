@@ -27,6 +27,16 @@ def rent_invoices():
   rent_invoices = RentInvoice.query.order_by(desc(RentInvoice.id)).all()
   return render_template("invoices/rent_invoices.html", rent_invoices=rent_invoices)
 
+@blueprint.route("/search", methods=["GET"])
+def search():
+  """Search rent invoices."""
+  search_term = request.args.get('q', '')
+  if search_term == '':  # Show all rent invoices if no search term
+    return redirect(url_for('rent_invoices.rent_invoices'))
+  
+  rent_invoices = RentInvoice.query.filter(RentInvoice.name.contains(search_term)).order_by(desc(RentInvoice.id)).all()
+  return render_template("invoices/rent_invoices.html", rent_invoices=rent_invoices, search_term=search_term)
+
 @blueprint.route('/<int:rent_invoice_id>', methods=['GET'])
 @login_required
 def view_rent_invoice(rent_invoice_id):
