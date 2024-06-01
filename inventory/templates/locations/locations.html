@@ -3,35 +3,25 @@
 <div class="container my-4">
   <h3>LOCATIONS</h3>
 
-  <div class="d-flex justify-content-between my-4">
-    <a class="btn btn-primary" href="{{ url_for('location.new_location') }}"><i class="fa-solid fa-plus"></i> Add Location</a>
-    <div class="d-flex align-items-center">
+  <div class="d-flex justify-content-end my-4">
+    <div class="d-flex align-items-center gap-2">
       <form action="{{ url_for('location.search') }}" method="get" class="d-inline position-relative">
         <div class="input-group">
-          <input
-            id="search-input"
-            type="text" name="q"
-            placeholder="Search locations"
-            class="form-control d-inline-block"
-            value="{{ search_term }}" style="width: auto;"
-            oninput="toggleClearButton()"
-          >
+          <input id="search-input" type="text" name="q" placeholder="Search locations"
+            class="form-control d-inline-block" value="{{ search_term }}" style="width: auto;"
+            oninput="toggleClearButton()">
           <div class="input-group-append">
             <button class="btn btn-primary" type="submit">
               <i class="fa-solid fa-search"></i>
             </button>
           </div>
         </div>
-        <button
-          id="clear-button"
-          type="button"
-          class="btn position-absolute"
-          style="right: 40px; top: 0;"
-          onclick="clearSearch()"
-        >
+        <button id="clear-button" type="button" class="btn position-absolute" style="right: 40px; top: 0;"
+          onclick="clearSearch()">
           <i class="fa-solid fa-times"></i>
         </button>
       </form>
+      <a class="btn btn-primary" href="{{ url_for('location.new_location') }}"><i class="fa-solid fa-plus"></i> New</a>
     </div>
   </div>
   {% if locations %}
@@ -59,10 +49,10 @@
           <span class="dot-status"></span> {{ 'Active' if location.is_active else 'Inactive' }}
         </td>
         <td>
-          <a class="btn btn-sm btn-primary" href="{{ url_for('location.view_location', location_id=location.id) }}">View</a>
+          <a class="btn btn-sm btn-primary"
+            href="{{ url_for('location.view_location', location_id=location.id) }}">View</a>
           <a id="locations-delete-btn" class="btn btn-sm btn-danger"
-            data-url="{{ url_for('location.delete_location', location_id=location.id) }}"
-            data-bs-toggle="modal"
+            data-url="{{ url_for('location.delete_location', location_id=location.id) }}" data-bs-toggle="modal"
             data-bs-target="#locationDeleteModal">
             Delete
           </a>
@@ -77,7 +67,8 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="locationDeleteModal" tabindex="-1" aria-labelledby="locationDeleteModalLabel" aria-hidden="true">
+<div class="modal fade" id="locationDeleteModal" tabindex="-1" aria-labelledby="locationDeleteModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">

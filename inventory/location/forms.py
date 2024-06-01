@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Public forms."""
-from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectField, StringField, IntegerField, SubmitField, RadioField, ValidationError
 from wtforms.validators import DataRequired

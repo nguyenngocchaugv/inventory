@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """Tool models."""
-import datetime as dt
-
 from sqlalchemy import UniqueConstraint, func
 
 from inventory.database import Column, PkModel, db, reference_col, relationship

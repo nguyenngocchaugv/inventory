@@ -12,9 +12,8 @@ from flask import (
 from flask import current_app
 from flask_login import current_user, login_required
 from sqlalchemy import and_, desc
-from db.seeds import RoleEnum
 from inventory.user.forms import UserForm
-from inventory.user.models import Role, User
+from inventory.user.models import Role, RoleEnum, User
 from inventory.utils import flash_errors
 
 blueprint = Blueprint("user", __name__, url_prefix="/users", static_folder="../static")
@@ -24,17 +23,21 @@ blueprint = Blueprint("user", __name__, url_prefix="/users", static_folder="../s
 @login_required
 def users():
   """List users."""
-  users = User.query.join(User.role).filter(Role.name != RoleEnum.SUPER_ADMIN.value).order_by(desc(User.id)).all()
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
+  users = User.query.join(User.role).filter(Role.name != RoleEnum.SUPER_ADMIN.value).order_by(desc(User.id)).paginate(page=page, per_page=per_page, error_out=False)
   return render_template("users/users.html", users=users)
 
 @blueprint.route("/search", methods=["GET"])
 def search():
   """Search users."""
   search_term = request.args.get('q', '')
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
   if search_term == '':  # Show all users if no search term
-    return redirect(url_for('user.users'))
+    return redirect(url_for('user.users', page=page))
   
-  users = User.query.join(User.role).filter(and_(Role.name != RoleEnum.SUPER_ADMIN.value, User.email.contains(search_term))).order_by(desc(User.id)).all()
+  users = User.query.join(User.role).filter(and_(Role.name != RoleEnum.SUPER_ADMIN.value, User.email.contains(search_term))).order_by(desc(User.id)).paginate(page=page, per_page=per_page, error_out=False)
   return render_template("users/users.html", users=users, search_term=search_term)
 
 @blueprint.route('/<int:user_id>', methods=['GET'])

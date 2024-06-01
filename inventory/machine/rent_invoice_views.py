@@ -9,12 +9,10 @@ from flask import (
   url_for,
   request
 )
-from flask import current_app
 from flask_login import login_required
 from sqlalchemy import desc
-from inventory.location.models import Location, LocationType
-from inventory.machine.forms import MachineStatusEnum, RentInvoiceEditForm, RentInvoiceForm, RentInvoiceStatusEnum
-from inventory.machine.models import Machine, RentInvoice, RentInvoiceHistory
+from inventory.machine.forms import RentInvoiceEditForm, RentInvoiceForm
+from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice, RentInvoiceHistory, RentInvoiceStatusEnum
 from inventory.utils import flash_errors
 
 blueprint = Blueprint("rent_invoices", __name__, url_prefix="/rent-invoices", static_folder="../static")
@@ -99,7 +97,6 @@ def edit_rent_invoice_status(rent_invoice_id):
     return redirect(url_for('rent_invoices.rent_invoices'))
 
   if request.method == 'POST':
-    current_app.logger.info(request.form)
     form = RentInvoiceEditForm(request.form, obj=rent_invoice)
   else:
     form = RentInvoiceEditForm(obj=rent_invoice)

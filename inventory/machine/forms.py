@@ -1,27 +1,14 @@
 # -*- coding: utf-8 -*-
 """Public forms."""
-from flask import current_app
 from flask_wtf import FlaskForm
 from sqlalchemy import and_
 from wtforms import DateTimeField, HiddenField, SelectField, StringField, SubmitField, FloatField, ValidationError, TextAreaField
 from wtforms.validators import DataRequired
-from enum import Enum
 
-from db.seeds import LocationTypeEnum, RoleEnum
-from inventory.location.models import Location, LocationType
-from inventory.machine.models import Machine
-from inventory.user.models import Role, User
+from inventory.location.models import Location, LocationType, LocationTypeEnum
+from inventory.machine.models import Machine, MachineStatusEnum, RentInvoiceStatusEnum
+from inventory.user.models import Role, RoleEnum, User
 from inventory.utils import validate_decimal_places
-
-class MachineStatusEnum(Enum):
-  AVAILABLE = "AVAILABLE"
-  FIXING = "FIXING"
-  HIRING = "HIRING"
-  
-class RentInvoiceStatusEnum(Enum):
-  ACTIVE = "ACTIVE"
-  COMPLETED = "COMPLETED"
-  CANCELLED = "CANCELLED"
     
 class RentInvoiceForm(FlaskForm):
   """Rent invoice form."""

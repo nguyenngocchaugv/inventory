@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
 """Machines models."""
 
+from enum import Enum
 from inventory.database import Column, PkModel, db, relationship, reference_col
 
+class MachineStatusEnum(Enum):
+  AVAILABLE = "AVAILABLE"
+  FIXING = "FIXING"
+  HIRING = "HIRING"
+  
+class RentInvoiceStatusEnum(Enum):
+  ACTIVE = "ACTIVE"
+  COMPLETED = "COMPLETED"
+  CANCELLED = "CANCELLED"
+  
 class RentInvoice(PkModel):
   """A rent invoice of the app."""
 

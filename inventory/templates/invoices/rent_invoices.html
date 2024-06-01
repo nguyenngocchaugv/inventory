@@ -2,35 +2,26 @@
 {% block content %}
 <div class="container my-4">
   <h3>RENT INVOICES</h3>
-  <div class="d-flex justify-content-between my-4">
-    <a class="btn btn-primary" href="{{ url_for('rent_invoices.new_rent_invoice') }}"><i class="fa-solid fa-plus"></i> Add Rent Invoice</a>
-    <div class="d-flex align-items-center">
+  <div class="d-flex justify-content-end my-4">
+    <div class="d-flex align-items-center gap-2">
       <form action="{{ url_for('rent_invoices.search') }}" method="get" class="d-inline position-relative">
         <div class="input-group">
-          <input
-            id="search-input"
-            type="text" name="q"
-            placeholder="Search rent invoices"
-            class="form-control d-inline-block"
-            value="{{ search_term }}" style="width: auto;"
-            oninput="toggleClearButton()"
-          >
+          <input id="search-input" type="text" name="q" placeholder="Search rent invoices"
+            class="form-control d-inline-block" value="{{ search_term }}" style="width: auto;"
+            oninput="toggleClearButton()">
           <div class="input-group-append">
             <button class="btn btn-primary" type="submit">
               <i class="fa-solid fa-search"></i>
             </button>
           </div>
         </div>
-        <button
-          id="clear-button"
-          type="button"
-          class="btn position-absolute"
-          style="right: 40px; top: 0;"
-          onclick="clearSearch()"
-        >
+        <button id="clear-button" type="button" class="btn position-absolute" style="right: 40px; top: 0;"
+          onclick="clearSearch()">
           <i class="fa-solid fa-times"></i>
         </button>
       </form>
+      <a class="btn btn-primary" href="{{ url_for('rent_invoices.new_rent_invoice') }}"><i class="fa-solid fa-plus"></i>
+        New</a>
     </div>
   </div>
   {% if rent_invoices %}
@@ -60,13 +51,13 @@
           <td>{{ invoice.end_date.strftime('%d/%m/%Y') }}</td>
           <td>
             {% if invoice.status == 'ACTIVE' %}
-              <span class="badge bg-success">{{ invoice.status }}</span>
+            <span class="badge bg-success">{{ invoice.status }}</span>
             {% elif invoice.status == 'CANCELLED' %}
-              <span class="badge bg-danger">{{ invoice.status }}</span>
+            <span class="badge bg-danger">{{ invoice.status }}</span>
             {% elif invoice.status == 'COMPLETED' %}
-              <span class="badge bg-primary">{{ invoice.status }}</span>
+            <span class="badge bg-primary">{{ invoice.status }}</span>
             {% else %}
-              <span class="badge bg-secondary">{{ invoice.status }}</span>
+            <span class="badge bg-secondary">{{ invoice.status }}</span>
             {% endif %}
           </td>
           <td>{{ invoice.location.name }}</td>
@@ -74,17 +65,17 @@
           <td>{{ invoice.machine.name }}</td>
           <td>
             {% if invoice.status == 'ACTIVE' %}
-              {% if invoice.machine.status == 'AVAILABLE' %}
-              <span class="badge bg-success">{{ invoice.machine.status }}</span>
-              {% elif invoice.machine.status == 'FIXING' %}
-                <span class="badge bg-warning">{{ invoice.machine.status }}</span>
-              {% elif invoice.machine.status == 'HIRING' %}
-                <span class="badge bg-primary">{{ invoice.machine.status }}</span>
-              {% else %}
-                <span class="badge bg-secondary">{{ invoice.machine.status }}</span>
-              {% endif %}
+            {% if invoice.machine.status == 'AVAILABLE' %}
+            <span class="badge bg-success">{{ invoice.machine.status }}</span>
+            {% elif invoice.machine.status == 'FIXING' %}
+            <span class="badge bg-warning">{{ invoice.machine.status }}</span>
+            {% elif invoice.machine.status == 'HIRING' %}
+            <span class="badge bg-primary">{{ invoice.machine.status }}</span>
             {% else %}
-              <span class="badge bg-secondary">Previously hired</span>
+            <span class="badge bg-secondary">{{ invoice.machine.status }}</span>
+            {% endif %}
+            {% else %}
+            <span class="badge bg-secondary">Previously hired</span>
             {% endif %}
           </td>
           <td>

@@ -12,8 +12,8 @@ from flask import (
 from flask import current_app
 from flask_login import login_required
 from sqlalchemy import desc
-from inventory.machine.forms import MachineForm, MachineStatusEnum, RentInvoiceStatusEnum
-from inventory.machine.models import Machine, RentInvoice, RentInvoiceHistory
+from inventory.machine.forms import MachineForm
+from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice, RentInvoiceHistory, RentInvoiceStatusEnum
 from inventory.user.models import User
 from inventory.utils import flash_errors
 

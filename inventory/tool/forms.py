@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Public forms."""
 from collections import defaultdict
-from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import DateTimeField, DecimalField, FieldList, FormField, HiddenField, SelectField, StringField, IntegerField, SubmitField, FloatField, ValidationError
 from wtforms.validators import DataRequired, NumberRange

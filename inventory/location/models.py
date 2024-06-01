@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 """Locations models."""
 
+from enum import Enum
 from sqlalchemy import UniqueConstraint
 from inventory.database import Column, PkModel, db, relationship, reference_col
 
+class LocationTypeEnum(Enum):
+  SCHOOL = 'School'
+  WAREHOUSE = 'Warehouse'
+  SUPPLIER = 'Supplier'
+  
 class Location(PkModel):
   """A location of the app."""
 

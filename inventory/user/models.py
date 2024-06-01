@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """User models."""
 import datetime as dt
+from enum import Enum
 
 from flask_login import UserMixin
 from sqlalchemy import UniqueConstraint
@@ -9,6 +10,11 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from inventory.database import Column, PkModel, db, relationship, reference_col
 from inventory.extensions import bcrypt
 
+class RoleEnum(Enum):
+  SUPER_ADMIN = 'SuperAdmin'
+  ADMIN = 'Admin'
+  USER = 'User'
+  
 class Role(PkModel):
     """A role for a user."""
 

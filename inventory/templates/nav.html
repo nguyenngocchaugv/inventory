@@ -66,11 +66,13 @@
       </li>
     </ul>
     {% endif %}
-    <ul class="navbar-nav my-auto">
-      <li class="nav-item">
-        <a class="nav-link navbar-text" href="{{ url_for('public.login') }}">Login</a>
-      </li>
-    </ul>
+    {% if not current_user or not current_user.is_authenticated %}
+      <ul class="navbar-nav my-auto">
+        <li class="nav-item">
+          <a class="nav-link navbar-text" href="{{ url_for('public.login') }}">Login</a>
+        </li>
+      </ul>
+    {% endif %}
   </div><!-- /.navbar-collapse -->
   </div>
 </nav>

@@ -3,37 +3,27 @@
 <div class="container my-4">
   <h3>USERS</h3>
 
-  <div class="d-flex justify-content-between my-4">
-    {% if current_user.role.name == 'SuperAdmin' or current_user.role.name == 'Admin' %}
-    <a class="btn btn-primary" href="{{ url_for('user.new_user') }}"><i class="fa-solid fa-plus"></i> Add User</a>
-  {% endif %}
-    <div class="d-flex align-items-center">
+  <div class="d-flex justify-content-end my-4">
+    <div class="d-flex align-items-center gap-2">
       <form action="{{ url_for('user.search') }}" method="get" class="d-inline position-relative">
         <div class="input-group">
-          <input
-            id="search-input"
-            type="text" name="q"
-            placeholder="Search users by email"
-            class="form-control d-inline-block"
-            value="{{ search_term }}" style="width: auto;"
-            oninput="toggleClearButton()"
-          >
+          <input id="search-input" type="text" name="q" placeholder="Search users by email"
+            class="form-control d-inline-block" value="{{ search_term }}" style="width: auto;"
+            oninput="toggleClearButton()">
           <div class="input-group-append">
             <button class="btn btn-primary" type="submit">
               <i class="fa-solid fa-search"></i>
             </button>
           </div>
         </div>
-        <button
-          id="clear-button"
-          type="button"
-          class="btn position-absolute"
-          style="right: 40px; top: 0;"
-          onclick="clearSearch()"
-        >
+        <button id="clear-button" type="button" class="btn position-absolute" style="right: 40px; top: 0;"
+          onclick="clearSearch()">
           <i class="fa-solid fa-times"></i>
         </button>
       </form>
+      {% if current_user.role.name == 'SuperAdmin' or current_user.role.name == 'Admin' %}
+      <a class="btn btn-primary" href="{{ url_for('user.new_user') }}"><i class="fa-solid fa-plus"></i> New</a>
+      {% endif %}
     </div>
   </div>
 
@@ -69,15 +59,15 @@
           <td>
             <a class="btn btn-sm btn-primary" href="{{ url_for('user.view_user', user_id=user.id) }}">View</a>
             {% if current_user.is_authenticated
-              and (current_user.role.name == 'SuperAdmin'
-                    or (current_user.role.name == 'Admin'
-                        and user.role.name != 'Admin' and current_user.id != user.id))
+            and (current_user.role.name == 'SuperAdmin'
+            or (current_user.role.name == 'Admin'
+            and user.role.name != 'Admin' and current_user.id != user.id))
             %}
-              <a id="users-delete-btn" class="btn btn-sm btn-danger"
-                data-url="{{ url_for('user.delete_user', user_id=user.id) }}" data-bs-toggle="modal"
-                data-bs-target="#userDeleteModal">
-                Delete
-              </a>
+            <a id="users-delete-btn" class="btn btn-sm btn-danger"
+              data-url="{{ url_for('user.delete_user', user_id=user.id) }}" data-bs-toggle="modal"
+              data-bs-target="#userDeleteModal">
+              Delete
+            </a>
             {% endif %}
           </td>
         </tr>
@@ -85,6 +75,50 @@
       </tbody>
     </table>
   </div>
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-end">
+      {% if users.has_prev %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('user.search', page=users.prev_num, q=search_term) }}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <a class="page-link" href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% for page_num in users.iter_pages() %}
+        {% if page_num %}
+          {% if page_num != users.page %}
+            <li class="page-item"><a class="page-link" href="{{ url_for('user.search', page=page_num, q=search_term) }}">{{ page_num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+          {% endif %}
+        {% else %}
+         <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+        {% endif %}
+      {% endfor %}
+
+      {% if users.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('user.search', page=users.next_num, q=search_term) }}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
   {% else %}
   <h4 class="text-center m-4">No users found.</h4>
   {% endif %}
