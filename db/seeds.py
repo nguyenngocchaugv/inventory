@@ -1,6 +1,8 @@
 # db/seeds.py
 
 from datetime import datetime
+import random
+import string
 from inventory.location.models import Location, LocationType, LocationTypeEnum
 from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice, RentInvoiceHistory, RentInvoiceStatusEnum
 from inventory.tool.models import InvoiceItem, SellInvoice, Tool
@@ -28,7 +30,14 @@ def seed():
     email='superadmin@example.com',
     password='superadmin',
     first_name='Super',
+    telephone=''.join(random.choices(string.digits, k=10)),  # Generate a random 10-digit telephone number
     last_name='Admin',
+    street='Oak Street',
+    ward='Ward 1',
+    district='District 1',
+    city='City 1',
+    state='State 1',
+    zip_code='12345',
     is_active=True,
     position='Super Admin',
     work_duration=8,
@@ -44,9 +53,9 @@ def seed():
   
   # Create an Admin user
   admin_users = [
-    {'username': 'admin', 'email': 'admin@example.com', 'password': 'admin', 'first_name': 'Admin', 'last_name': 'User', 'position': 'Admin', 'work_duration': 8, 'is_active': True, 'created_by': 1, 'updated_by': 1},
-    {'username': 'admin1', 'email': 'admin1@example.com', 'password': 'admin1', 'first_name': 'Admin1', 'last_name': 'User1', 'position': 'Admin', 'work_duration': 8, 'is_active': True, 'created_by': 1, 'updated_by': 1},
-    {'username': 'admin2', 'email': 'admin2@example.com', 'password': 'admin2', 'first_name': 'Admin2', 'last_name': 'User2', 'position': 'Admin', 'work_duration': 8, 'is_active': True, 'created_by': 1, 'updated_by': 1},
+    {'username': 'admin', 'email': 'admin@example.com', 'password': 'admin', 'first_name': 'Admin', 'last_name': 'User', 'position': 'Admin', 'work_duration': 8, 'is_active': True, 'created_by': 1, 'updated_by': 1,'street': 'Oak Street', 'ward': 'Ward 1', 'district': 'District 1', 'city': 'City 1', 'state': 'State 1', 'zip_code': '12345'},
+    {'username': 'admin1', 'email': 'admin1@example.com', 'password': 'admin1', 'first_name': 'Admin1', 'last_name': 'User1', 'position': 'Admin', 'work_duration': 8, 'is_active': True, 'created_by': 1, 'updated_by': 1, 'street': 'Oak Street', 'ward': 'Ward 1', 'district': 'District 1', 'city': 'City 1', 'state': 'State 1', 'zip_code': '12345'},
+    {'username': 'admin2', 'email': 'admin2@example.com', 'password': 'admin2', 'first_name': 'Admin2', 'last_name': 'User2', 'position': 'Admin', 'work_duration': 8, 'is_active': True, 'created_by': 1, 'updated_by': 1, 'street': 'Oak Street', 'ward': 'Ward 1', 'district': 'District 1', 'city': 'City 1', 'state': 'State 1', 'zip_code': '12345'},
   ]
   
   for admin_user in admin_users:
@@ -54,9 +63,16 @@ def seed():
       username=admin_user['username'],
       email=admin_user['email'],
       password=admin_user['password'],
+      telephone=''.join(random.choices(string.digits, k=10)),  # Generate a random 10-digit telephone number
       first_name=admin_user['first_name'],
       last_name=admin_user['last_name'],
       is_active=admin_user['is_active'],
+      street=admin_user['street'],
+      ward=admin_user['ward'],
+      district=admin_user['district'],
+      city=admin_user['city'],
+      state=admin_user['state'],
+      zip_code=admin_user['zip_code'],
       position=admin_user['position'],
       work_duration=admin_user['work_duration'],
       created_by=1,
@@ -69,27 +85,34 @@ def seed():
   
   # Create users
   users = [
-    {'username': 'johndoe', 'email': 'johndoe@example.com', 'password': 'password', 'first_name': 'John', 'last_name': 'Doe', 'position': 'Staff', 'work_duration': 40},
-    {'username': 'janedoe', 'email': 'janedoe@example.com', 'password': 'password', 'first_name': 'Jane', 'last_name': 'Doe', 'position': 'Staff', 'work_duration': 40},
-    {'username': 'mikejohnson', 'email': 'mikejohnson@example.com', 'password': 'password', 'first_name': 'Mike', 'last_name': 'Johnson', 'position': 'Staff', 'work_duration': 40},
-    {'username': 'sarahsmith', 'email': 'sarahsmith@example.com', 'password': 'password', 'first_name': 'Sarah', 'last_name': 'Smith', 'position': 'Staff', 'work_duration': 40},
-    {'username': 'jamesbrown', 'email': 'jamesbrown@example.com', 'password': 'password', 'first_name': 'James', 'last_name': 'Brown', 'position': 'Staff', 'work_duration': 40},
-    {'username': 'emilyjones', 'email': 'emilyjones@example.com', 'password': 'password', 'first_name': 'Emily', 'last_name': 'Jones', 'position': 'Staff', 'work_duration': 40},
-    {'username': 'davidwilliams', 'email': 'davidwilliams@example.com', 'password': 'password', 'first_name': 'David', 'last_name': 'Williams', 'position': 'Staff', 'work_duration': 40},
-    {'username': 'olivertaylor', 'email': 'olivertaylor@example.com', 'password': 'password', 'first_name': 'Oliver', 'last_name': 'Taylor', 'position': 'Staff', 'work_duration': 40},
-    {'username': 'sophiawilson', 'email': 'sophiawilson@example.com', 'password': 'password', 'first_name': 'Sophia', 'last_name': 'Wilson', 'position': 'Staff', 'work_duration': 40},
-    {'username': 'williammartin', 'email': 'williammart@example.com', 'password': 'password', 'first_name': 'William', 'last_name': 'Martin', 'position': 'Staff', 'work_duration': 40},
-    {'username': 'danieldavis', 'email': 'danieldavis@example.com', 'password': 'password', 'first_name': 'Daniel', 'last_name': 'Davis', 'position': 'Staff', 'work_duration': 40},
+    {'username': 'johndoe', 'email': 'johndoe@example.com', 'password': 'password', 'first_name': 'John', 'last_name': 'Doe', 'position': 'Staff', 'work_duration': 40, 'street': 'Oak Street', 'ward': 'Ward 1', 'district': 'District 1', 'city': 'City 1', 'state': 'State 1', 'zip_code': '12345'},
+    {'username': 'janedoe', 'email': 'janedoe@example.com', 'password': 'password', 'first_name': 'Jane', 'last_name': 'Doe', 'position': 'Staff', 'work_duration': 40, 'street': 'Pine Street', 'ward': 'Ward 2', 'district': 'District 2', 'city': 'City 2', 'state': 'State 2', 'zip_code': '12345'},
+    {'username': 'mikejohnson', 'email': 'mikejohnson@example.com', 'password': 'password', 'first_name': 'Mike', 'last_name': 'Johnson', 'position': 'Staff', 'work_duration': 40, 'street': 'Maple Street', 'ward': 'Ward 3', 'district': 'District 3', 'city': 'City 3', 'state': 'State 3', 'zip_code': '12345'},
+    {'username': 'sarahsmith', 'email': 'sarahsmith@example.com', 'password': 'password', 'first_name': 'Sarah', 'last_name': 'Smith', 'position': 'Staff', 'work_duration': 40, 'street': 'Oak Street', 'ward': 'Ward 1', 'district': 'District 1', 'city': 'City 1', 'state': 'State 1', 'zip_code': '12345'},
+    {'username': 'jamesbrown', 'email': 'jamesbrown@example.com', 'password': 'password', 'first_name': 'James', 'last_name': 'Brown', 'position': 'Staff', 'work_duration': 40, 'street': 'Pine Street', 'ward': 'Ward 2', 'district': 'District 2', 'city': 'City 2', 'state': 'State 2', 'zip_code': '12345'},
+    {'username': 'emilyjones', 'email': 'emilyjones@example.com', 'password': 'password', 'first_name': 'Emily', 'last_name': 'Jones', 'position': 'Staff', 'work_duration': 40, 'street': 'Maple Street', 'ward': 'Ward 3', 'district': 'District 3', 'city': 'City 3', 'state': 'State 3', 'zip_code': '12345'},
+    {'username': 'davidwilliams', 'email': 'davidwilliams@example.com', 'password': 'password', 'first_name': 'David', 'last_name': 'Williams', 'position': 'Staff', 'work_duration': 40, 'street': 'Oak Street', 'ward': 'Ward 1', 'district': 'District 1', 'city': 'City 1', 'state': 'State 1', 'zip_code': '12345'},
+    {'username': 'olivertaylor', 'email': 'olivertaylor@example.com', 'password': 'password', 'first_name': 'Oliver', 'last_name': 'Taylor', 'position': 'Staff', 'work_duration': 40, 'street': 'Pine Street', 'ward': 'Ward 2', 'district': 'District 2', 'city': 'City 2', 'state': 'State 2', 'zip_code': '12345'},
+    {'username': 'sophiawilson', 'email': 'sophiawilson@example.com', 'password': 'password', 'first_name': 'Sophia', 'last_name': 'Wilson', 'position': 'Staff', 'work_duration': 40, 'street': 'Maple Street', 'ward': 'Ward 3', 'district': 'District 3', 'city': 'City 3', 'state': 'State 3', 'zip_code': '12345'},
+    {'username': 'williammartin', 'email': 'williammart@example.com', 'password': 'password', 'first_name': 'William', 'last_name': 'Martin', 'position': 'Staff', 'work_duration': 40, 'street': 'Oak Street', 'ward': 'Ward 1', 'district': 'District 1', 'city': 'City 1', 'state': 'State 1', 'zip_code': '12345'},
+    {'username': 'danieldavis', 'email': 'danieldavis@example.com', 'password': 'password', 'first_name': 'Daniel', 'last_name': 'Davis', 'position': 'Staff', 'work_duration': 40, 'street': 'Pine Street', 'ward': 'Ward 2', 'district': 'District 2', 'city': 'City 2', 'state': 'State 2', 'zip_code': '12345'},
     # Add more users...
   ]
   
   for user in users:
     user = User(
-      username=user['username'],
-      email=user['email'],
-      password=user['password'],
       first_name=user['first_name'],
       last_name=user['last_name'],
+      email=user['email'],
+      telephone=''.join(random.choices(string.digits, k=10)),  # Generate a random 10-digit telephone number
+      username=user['username'],
+      password=user['password'],
+      street=user['street'],
+      ward=user['ward'],
+      district=user['district'],
+      city=user['city'],
+      state=user['state'],
+      zip_code=user['zip_code'],
       is_active=True,
       position=user['position'],
       work_duration=user['work_duration'],
@@ -297,8 +320,8 @@ def seed():
     {'name': 'Tablet', 'description': 'Tablet Description', 'type': 'Tablet', 'serial': 'TABLET-001', 'model': 'Samsung', 'price': 300.00, 'status': MachineStatusEnum.AVAILABLE.value},
     {'name': 'Smartphone', 'description': 'Smartphone Description', 'type': 'Smartphone', 'serial': 'SMARTPHONE-001', 'model': 'Apple', 'price': 600.00, 'status': MachineStatusEnum.AVAILABLE.value},
     {'name': 'Camera', 'description': 'Camera Description', 'type': 'Camera', 'serial': 'CAMERA-001', 'model': 'Canon', 'price': 700.00, 'status': MachineStatusEnum.AVAILABLE.value},
-    {'name': 'Microphone', 'description': 'Microphone Description', 'type': 'Microphone', 'serial': 'MICROPHONE-001', 'model': 'Blue', 'price': 800.00, 'status': MachineStatusEnum.AVAILABLE.value},
-    {'name': 'Speaker', 'description': 'Speaker Description', 'type': 'Speaker', 'serial': 'SPEAKER-001', 'model': 'Bose', 'price': 900.00, 'status': MachineStatusEnum.AVAILABLE.value},
+    {'name': 'Microphone', 'description': 'Microphone Description', 'type': 'Microphone', 'serial': 'MICROPHONE-001', 'model': 'Blue', 'price': 800.00, 'status': MachineStatusEnum.FIXING.value},
+    {'name': 'Speaker', 'description': 'Speaker Description', 'type': 'Speaker', 'serial': 'SPEAKER-001', 'model': 'Bose', 'price': 900.00, 'status': MachineStatusEnum.HIRING.value},
     # Add more machines...
   ]
   

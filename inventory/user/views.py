@@ -9,7 +9,6 @@ from flask import (
   url_for,
   request
 )
-from flask import current_app
 from flask_login import current_user, login_required
 from sqlalchemy import and_, desc
 from inventory.user.forms import UserForm
@@ -98,8 +97,6 @@ def edit_user(user_id):
 
   if request.method == 'POST':
     form = UserForm(request.form)
-    
-    current_app.logger.info(user)
   else:
     form = UserForm(obj=user)
     
