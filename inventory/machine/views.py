@@ -24,7 +24,9 @@ blueprint = Blueprint("machine", __name__, url_prefix="/machines", static_folder
 @login_required
 def machines():
   """List machines."""
-  machines = Machine.query.filter_by(is_deleted=False).order_by(desc(Machine.id)).all()
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
+  machines = Machine.query.filter_by(is_deleted=False).order_by(desc(Machine.id)).paginate(page=page, per_page=per_page, error_out=False)
   
   # Query the User table and create a dictionary where the keys are user IDs and the values are user emails
   users = {user.id: user.email for user in User.query.all()}
@@ -39,10 +41,12 @@ def machines():
 def search():
   """Search machines."""
   search_term = request.args.get('q', '')
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
   if search_term == '':  # Show all machines if no search term
-    return redirect(url_for('machine.machines'))
+    return redirect(url_for('machine.machines', page=page))
   
-  machines = Machine.query.filter_by(is_deleted=False).filter(Machine.name.contains(search_term)).order_by(desc(Machine.id)).all()
+  machines = Machine.query.filter_by(is_deleted=False).filter(Machine.name.contains(search_term)).order_by(desc(Machine.id)).paginate(page=page, per_page=per_page, error_out=False)
   
   # Query the User table and create a dictionary where the keys are user IDs and the values are user emails
   users = {user.id: user.email for user in User.query.all()}

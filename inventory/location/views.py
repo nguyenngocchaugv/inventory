@@ -22,17 +22,21 @@ blueprint = Blueprint("location", __name__, url_prefix="/locations", static_fold
 @login_required
 def locations():
   """List locations."""
-  locations = Location.query.filter_by(is_deleted=False).order_by(desc(Location.id)).all()
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
+  locations = Location.query.filter_by(is_deleted=False).order_by(desc(Location.id)).paginate(page=page, per_page=per_page, error_out=False)
   return render_template("locations/locations.html", locations=locations)
 
 @blueprint.route("/search", methods=["GET"])
 def search():
   """Search locations."""
   search_term = request.args.get('q', '')
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
   if search_term == '':  # Show all locations if no search term
-    return redirect(url_for('location.locations'))
+    return redirect(url_for('location.locations', page=page))
   
-  locations = Location.query.filter_by(is_deleted=False).filter(Location.name.contains(search_term)).order_by(desc(Location.id)).all()
+  locations = Location.query.filter_by(is_deleted=False).filter(Location.name.contains(search_term)).order_by(desc(Location.id)).paginate(page=page, per_page=per_page, error_out=False)
   return render_template("locations/locations.html", locations=locations, search_term=search_term)
 
 @blueprint.route('/<int:location_id>', methods=['GET'])

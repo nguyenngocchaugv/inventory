@@ -23,17 +23,21 @@ blueprint = Blueprint("tool", __name__, url_prefix="/tools", static_folder="../s
 @login_required
 def tools():
   """List tools."""
-  tools = Tool.query.filter_by(is_deleted=False).order_by(desc(Tool.id)).all()
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
+  tools = Tool.query.filter_by(is_deleted=False).order_by(desc(Tool.id)).paginate(page=page, per_page=per_page, error_out=False)
   return render_template("tools/tools.html", tools=tools)
 
 @blueprint.route("/search", methods=["GET"])
 def search():
   """Search tools."""
   search_term = request.args.get('q', '')
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
   if search_term == '':  # Show all tools if no search term
-    return redirect(url_for('tool.tools'))
+    return redirect(url_for('tool.tools', page=page))
   
-  tools = Tool.query.filter_by(is_deleted=False).filter(Tool.name.contains(search_term)).order_by(desc(Tool.id)).all()
+  tools = Tool.query.filter_by(is_deleted=False).filter(Tool.name.contains(search_term)).order_by(desc(Tool.id)).paginate(page=page, per_page=per_page, error_out=False)
   return render_template("tools/tools.html", tools=tools, search_term=search_term)
 
 @blueprint.route('/<int:tool_id>', methods=['GET'])

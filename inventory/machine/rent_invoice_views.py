@@ -3,7 +3,6 @@
 from flask import (
   Blueprint,
   flash,
-  jsonify,
   redirect,
   render_template,
   url_for,
@@ -22,17 +21,21 @@ blueprint = Blueprint("rent_invoices", __name__, url_prefix="/rent-invoices", st
 @login_required
 def rent_invoices():
   """List rent_invoices."""
-  rent_invoices = RentInvoice.query.order_by(desc(RentInvoice.id)).all()
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
+  rent_invoices = RentInvoice.query.order_by(desc(RentInvoice.id)).paginate(page=page, per_page=per_page, error_out=False)
   return render_template("invoices/rent_invoices.html", rent_invoices=rent_invoices)
 
 @blueprint.route("/search", methods=["GET"])
 def search():
   """Search rent invoices."""
   search_term = request.args.get('q', '')
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
   if search_term == '':  # Show all rent invoices if no search term
-    return redirect(url_for('rent_invoices.rent_invoices'))
+    return redirect(url_for('rent_invoices.rent_invoices', page=page))
   
-  rent_invoices = RentInvoice.query.filter(RentInvoice.name.contains(search_term)).order_by(desc(RentInvoice.id)).all()
+  rent_invoices = RentInvoice.query.filter(RentInvoice.name.contains(search_term)).order_by(desc(RentInvoice.id)).paginate(page=page, per_page=per_page, error_out=False)
   return render_template("invoices/rent_invoices.html", rent_invoices=rent_invoices, search_term=search_term)
 
 @blueprint.route('/<int:rent_invoice_id>', methods=['GET'])

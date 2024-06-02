@@ -23,17 +23,21 @@ blueprint = Blueprint("sell_invoices", __name__, url_prefix="/sell-invoices", st
 @login_required
 def sell_invoices():
   """List sell_invoices."""
-  sell_invoices = SellInvoice.query.order_by(desc(SellInvoice.id)).all()
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
+  sell_invoices = SellInvoice.query.order_by(desc(SellInvoice.id)).paginate(page=page, per_page=per_page, error_out=False)
   return render_template("invoices/sell_invoices.html", sell_invoices=sell_invoices)
 
 @blueprint.route("/search", methods=["GET"])
 def search():
   """Search sell invoices."""
   search_term = request.args.get('q', '')
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
   if search_term == '':  # Show all sell invoices if no search term
-    return redirect(url_for('sell_invoices.sell_invoices'))
+    return redirect(url_for('sell_invoices.sell_invoices', page=page))
   
-  sell_invoices = SellInvoice.query.filter(SellInvoice.name.contains(search_term)).order_by(desc(SellInvoice.id)).all()
+  sell_invoices = SellInvoice.query.filter(SellInvoice.name.contains(search_term)).order_by(desc(SellInvoice.id)).paginate(page=page, per_page=per_page, error_out=False)
   return render_template("invoices/sell_invoices.html", sell_invoices=sell_invoices, search_term=search_term)
 
 @blueprint.route('/<int:sell_invoice_id>', methods=['GET'])
