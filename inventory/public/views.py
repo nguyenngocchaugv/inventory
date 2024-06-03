@@ -13,7 +13,7 @@ from flask import (
 from flask_login import current_user, login_required, login_user, logout_user
 
 from inventory.extensions import login_manager
-from inventory.public.forms import LoginForm
+from inventory.public.forms import ChangePasswordForm, LoginForm
 from inventory.user.forms import RegisterForm
 from inventory.user.models import User
 from inventory.utils import flash_errors
@@ -98,6 +98,20 @@ def register():
     else:
         flash_errors(form)
     return render_template("public/register.html", form=form)
+
+@blueprint.route("/change-password/", methods=["GET", "POST"])
+@login_required
+def change_password():
+    """Change password."""
+    form = ChangePasswordForm(request.form)
+    if form.validate_on_submit():
+        current_user.password = form.new_password.data
+        current_user.save()
+        flash("Password updated.", "success")
+        return redirect(url_for("public.home"))
+    else:
+        flash_errors(form)
+    return render_template("public/change_password.html", form=form)
 
 
 @blueprint.route("/about/")
