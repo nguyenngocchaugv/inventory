@@ -60,8 +60,6 @@ def login():
         return redirect(url_for('dashboard.dashboard'))
     # Store the next URL in the session
     session['next'] = request.args.get('next')
-    current_app.logger.info(request.args.get('next'))
-    current_app.logger.info(request.form)
 
     form = LoginForm(request.form)
     # Check the form is valid on submission (i.e., we're in a POST request)

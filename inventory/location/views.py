@@ -1,15 +1,21 @@
 # -*- coding: utf-8 -*-
 """Location views."""
+import io
+import os
 from flask import (
   Blueprint,
+  after_this_request,
+  current_app,
   flash,
   jsonify,
   redirect,
   render_template,
+  send_file,
   url_for,
   request
 )
 from flask_login import login_required
+import pandas as pd
 from sqlalchemy import desc
 from inventory.location.forms import LocationForm
 from inventory.location.models import Location, LocationType
@@ -133,3 +139,41 @@ def delete_location(location_id):
   else:
     flash("Location not found.", "danger")
   return jsonify({'redirect_url': url_for('location.locations')})
+
+@blueprint.route('/export', methods=['GET'])
+@login_required
+def export_locations():
+  """Export locations to CSV."""
+  locations = Location.query.filter_by(is_deleted=False).all()
+  # Convert the locations data to a pandas DataFrame
+  data = {
+  'Name': [location.name for location in locations],
+  'Type': [location.location_type.name for location in locations],
+  'Street': [location.street for location in locations],
+  'Ward': [location.ward for location in locations],
+  'District': [location.district for location in locations],
+  'City': [location.city for location in locations],
+  'Principal': [location.principal for location in locations],
+  'Telephone': [location.telephone for location in locations],
+  'Group': [location.group for location in locations],
+  'Total Classes': [location.num_class_total for location in locations],
+  'F1': [location.num_f1 for location in locations],
+  'F2': [location.num_f2 for location in locations],
+  'F3': [location.num_f3 for location in locations],
+  'Infant': [location.num_infant for location in locations],
+  'Office': [location.office for location in locations],
+  'Status': ['Active' if location.is_active else 'Inactive' for location in locations]
+  }
+  
+  df = pd.DataFrame(data)
+  
+   # Create an in-memory BytesIO object
+  output = io.BytesIO()
+ # Write the DataFrame to the BytesIO object
+  with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    df.to_excel(writer, sheet_name='Sheet1')
+
+  # Create a Flask response with the Excel file
+  output.seek(0)
+  return send_file(output, download_name='locations.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+  

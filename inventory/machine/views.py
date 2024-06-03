@@ -73,7 +73,6 @@ def view_machine(machine_id):
 def new_machine():
   """Create a new machine."""
   form = MachineForm(request.form)
-  # current_app.logger.info(form.data)
 
   if form.validate_on_submit():
     Machine.create(
