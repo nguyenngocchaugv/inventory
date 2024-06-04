@@ -23,6 +23,8 @@
       </form>
       {% if current_user.role.name == 'SuperAdmin' or current_user.role.name == 'Admin' %}
       <a class="btn btn-primary" href="{{ url_for('user.new_user') }}"><i class="fa-solid fa-plus"></i> New</a>
+      <!-- Export Button -->
+      <a class="btn btn-secondary ml-2" href="{{ url_for('user.export_users') }}"><i class="fa-solid fa-download"></i> Export</a>
       {% endif %}
     </div>
   </div>

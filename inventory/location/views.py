@@ -4,8 +4,6 @@ import io
 import os
 from flask import (
   Blueprint,
-  after_this_request,
-  current_app,
   flash,
   jsonify,
   redirect,
@@ -143,7 +141,7 @@ def delete_location(location_id):
 @blueprint.route('/export', methods=['GET'])
 @login_required
 def export_locations():
-  """Export locations to CSV."""
+  """Export locations to Excel."""
   locations = Location.query.filter_by(is_deleted=False).all()
   # Convert the locations data to a pandas DataFrame
   data = {
@@ -167,9 +165,9 @@ def export_locations():
   
   df = pd.DataFrame(data)
   
-   # Create an in-memory BytesIO object
+  # Create an in-memory BytesIO object
   output = io.BytesIO()
- # Write the DataFrame to the BytesIO object
+  # Write the DataFrame to the BytesIO object
   with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
     df.to_excel(writer, sheet_name='Sheet1')
 

@@ -22,6 +22,8 @@
       </form>
       <a class="btn btn-primary" href="{{ url_for('rent_invoices.new_rent_invoice') }}"><i class="fa-solid fa-plus"></i>
         New</a>
+      <!-- Export Button -->
+      <a class="btn btn-secondary ml-2" href="{{ url_for('rent_invoices.export_rent_invoices') }}"><i class="fa-solid fa-download"></i> Export</a>
     </div>
   </div>
   {% if rent_invoices.items %}

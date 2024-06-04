@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 """Tool views."""
+import io
 from flask import (
   Blueprint,
   flash,
   jsonify,
   redirect,
   render_template,
+  send_file,
   url_for,
   request
 )
 from flask import current_app
 from flask_login import login_required
+import pandas as pd
 from sqlalchemy import desc
 from inventory.tool.forms import ToolForm
 from inventory.tool.models import Tool
@@ -111,3 +114,29 @@ def delete_tool(tool_id):
   else:
     flash("Tool not found.", "danger")
   return jsonify({'redirect_url': url_for('tool.tools')})
+
+@blueprint.route('/export', methods=['GET'])
+@login_required
+def export_tools():
+  """Export tools to Excel."""
+  tools = Tool.query.filter_by(is_deleted=False).all()
+  # Convert the locations data to a pandas DataFrame
+  data = {
+    'Name': [tool.name for tool in tools],
+    'Type': [tool.type for tool in tools],
+    'Model': [tool.model for tool in tools],
+    'Price': [tool.price for tool in tools],
+    'Quantity': [tool.quantity for tool in tools],
+  }
+  
+  df = pd.DataFrame(data)
+  
+  # Create an in-memory BytesIO object
+  output = io.BytesIO()
+  # Write the DataFrame to the BytesIO object
+  with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    df.to_excel(writer, sheet_name='Sheet1')
+
+  # Create a Flask response with the Excel file
+  output.seek(0)
+  return send_file(output, download_name='tools.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 """Sell invoice views."""
+import io
 from flask import (
   Blueprint,
   flash,
   redirect,
   render_template,
+  send_file,
   url_for,
   request
 )
 from flask_login import login_required
+import pandas as pd
 from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
 from inventory.machine.forms import RentInvoiceEditForm, RentInvoiceForm
 from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice, RentInvoiceHistory, RentInvoiceStatusEnum
 from inventory.utils import flash_errors
@@ -123,3 +127,43 @@ def edit_rent_invoice_status(rent_invoice_id):
     flash_errors(form)
 
   return render_template("invoices/rent_invoice.html", form=form, mode='Edit')
+
+@blueprint.route('/export', methods=['GET'])
+@login_required
+def export_rent_invoices():
+  """Export rent invoices to Excel."""
+  # Query all invoices and their items
+  invoices = RentInvoice.query.order_by(desc(RentInvoice.id)).options(joinedload(RentInvoice.rent_invoice_histories)).all()
+
+ # Convert the invoices to a DataFrame
+  invoices_df = pd.DataFrame([{
+    'name': invoice.name,
+    'serial': invoice.serial,
+    'start_date': invoice.start_date,
+    'end_date': invoice.end_date,
+    'status': invoice.status,
+    'price': invoice.price,
+    'location_id': invoice.location_id,
+    'machine_id': invoice.machine_id,
+    'user_id': invoice.user_id,
+  } for invoice in invoices])
+  
+  # Convert the invoice histories to a DataFrame
+  histories_df = pd.DataFrame([{
+    'invoice_name': history.rent_invoice.name,
+    'status': history.status,
+  } for invoice in invoices for history in invoice.rent_invoice_histories])
+  
+  # Create an in-memory BytesIO object
+  output = io.BytesIO()
+    
+   # Write the DataFrames to the BytesIO object
+  with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    invoices_df.to_excel(writer, sheet_name='Rent Invoices', index=False)
+    histories_df.to_excel(writer, sheet_name='Rent Invoice Histories', index=False)
+
+
+  # Create a Flask response with the Excel file
+  output.seek(0)
+  return send_file(output, download_name='rent_invoices.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+

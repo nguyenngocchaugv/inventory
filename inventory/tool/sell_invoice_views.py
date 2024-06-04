@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 """Sell invoice views."""
+import io
 from flask import (
   Blueprint,
   flash,
   jsonify,
   redirect,
   render_template,
+  send_file,
   url_for,
   request
 )
 from flask_login import login_required
+import pandas as pd
+from sqlalchemy.orm import joinedload
 from sqlalchemy import desc
 
 from inventory.tool.forms import InvoiceItemForm, SellInvoiceForm
@@ -95,42 +99,40 @@ def get_invoice_item_form(row_index):
   form_html = render_template('invoices/sell_invoice_item_form.html', form=form)
   return jsonify({'form_html': form_html, 'tool_prices': form.tool_prices})
 
-# @blueprint.route("/<int:tool_id>/edit", methods=['GET', 'POST'])
-# @login_required
-# def edit_tool(tool_id):
-#   """View or edit a tool."""
-#   tool = Tool.query.get(tool_id)
-#   if not tool:
-#     flash("Tool not found.", "danger")
-#     return redirect(url_for('tool.tools'))
-
-#   if request.method == 'POST':
-#     form = ToolForm(request.form)
-#   else:
-#     form = ToolForm(obj=tool)
+@blueprint.route('/export', methods=['GET'])
+@login_required
+def export_sell_invoices():
+  """Export sell invoices to Excel."""
+  # Query all invoices and their items
+  invoices = SellInvoice.query.order_by(desc(SellInvoice.id)).options(joinedload(SellInvoice.invoice_items)).all()
+ # Convert the invoices to a DataFrame
+  invoices_df = pd.DataFrame([{
+    'name': invoice.name,
+    'description': invoice.description,
+    'issue_date': invoice.issue_date,
+    'location_id': invoice.location_id,
+    'total_price': invoice.total_price,
+  } for invoice in invoices])
+  
+  # Convert the invoice items to a DataFrame
+  items_df = pd.DataFrame([{
+    'invoice_name': item.invoice.name,
+    'tool_name': item.tool_name,
+    'tool_type': item.tool_type,
+    'tool_model': item.tool_model,
+    'quantity': item.quantity,
+    'price': item.price,
+  } for invoice in invoices for item in invoice.invoice_items])
+  
+  # Create an in-memory BytesIO object
+  output = io.BytesIO()
     
-#   if form.validate_on_submit():
-#     tool.update( 
-#      name=form.name.data,
-#       type=form.type.data,
-#       model=form.model.data,
-#       price=form.price.data,
-#       quantity=form.quantity.data,
-#     )
-#     flash("Tool is updated successfully.", "success")
-#     return redirect(url_for('tool.view_tool', tool_id=tool.id))
-#   else:
-#       flash_errors(form)
+  # Write the DataFrames to the BytesIO object
+  with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    invoices_df.to_excel(writer, sheet_name='Invoices', index=False)
+    items_df.to_excel(writer, sheet_name='Invoice Items', index=False)
 
-#   return render_template("tools/tool.html", form=form, mode='Edit', tool=tool)
 
-# @blueprint.route('/delete_tool/<int:tool_id>', methods=['POST'])
-# @login_required
-# def delete_tool(tool_id):
-#   tool = Tool.query.get(tool_id)
-#   if tool:
-#     Tool.delete(tool)
-#     flash("Tool is deleted successfully.", "success")
-#   else:
-#     flash("Tool not found.", "danger")
-#   return jsonify({'redirect_url': url_for('tool.tools')})
+  # Create a Flask response with the Excel file
+  output.seek(0)
+  return send_file(output, download_name='sell_invoices.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 """Machine views."""
+import io
 from flask import (
   Blueprint,
   flash,
   jsonify,
   redirect,
   render_template,
+  send_file,
   url_for,
   request
 )
 from flask import current_app
 from flask_login import login_required
+import pandas as pd
 from sqlalchemy import desc
 from inventory.machine.forms import MachineForm
 from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice, RentInvoiceHistory, RentInvoiceStatusEnum
@@ -147,3 +150,33 @@ def delete_machine(machine_id):
   else:
     flash("Machine not found.", "danger")
   return jsonify({'redirect_url': url_for('machine.machines')})
+
+@blueprint.route('/export', methods=['GET'])
+@login_required
+def export_machines():
+  """Export machines to Excel."""
+  machines = Machine.query.filter_by(is_deleted=False).all()
+  # Convert the machines data to a pandas DataFrame
+  data = {
+    'Name': [machine.name for machine in machines],
+    'Serial': [machine.serial for machine in machines],
+    'Start Date': [machine.start_date for machine in machines],
+    'End Date': [machine.end_date for machine in machines],
+    'Status': [machine.status for machine in machines],
+    'Price': [machine.price for machine in machines],
+    'Location': [machine.location.name for machine in machines],
+    'Machine': [machine.machine.name for machine in machines],
+    'User': [machine.user.email for machine in machines]
+  }
+  
+  df = pd.DataFrame(data)
+  
+  # Create an in-memory BytesIO object
+  output = io.BytesIO()
+  # Write the DataFrame to the BytesIO object
+  with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    df.to_excel(writer, sheet_name='Sheet1')
+
+  # Create a Flask response with the Excel file
+  output.seek(0)
+  return send_file(output, download_name='machines.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

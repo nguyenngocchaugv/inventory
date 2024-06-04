@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 """User views."""
+import io
 from flask import (
   Blueprint,
   flash,
   jsonify,
   redirect,
   render_template,
+  send_file,
   url_for,
   request
 )
 from flask_login import current_user, login_required
+import pandas as pd
 from sqlalchemy import and_, desc
 from inventory.user.forms import UserForm
 from inventory.user.models import Role, RoleEnum, User
@@ -137,3 +140,40 @@ def delete_user(user_id):
   else:
     flash("User not found.", "danger")
   return jsonify({'redirect_url': url_for('user.users')})
+
+@blueprint.route('/export', methods=['GET'])
+@login_required
+def export_users():
+  """Export users to Excel."""
+  users = User.query.join(User.role).filter(Role.name != RoleEnum.SUPER_ADMIN.value).order_by(desc(User.id)).all()
+  
+  # Convert the users data to a pandas DataFrame
+  data = {
+    'First Name': [user.first_name for user in users],
+    'Last Name': [user.last_name for user in users],
+    'Email': [user.email for user in users],
+    'Telephone': [user.telephone for user in users],
+    'Username': [user.username for user in users],
+    'Street': [user.street for user in users],
+    'Ward': [user.ward for user in users],
+    'District': [user.district for user in users],
+    'City': [user.city for user in users],
+    'State': [user.state for user in users],
+    'Zip Code': [user.zip_code for user in users],
+    'Position': [user.position for user in users],
+    'Work Duration': [user.work_duration for user in users],
+    'Role': [user.role.name for user in users],
+    'Is Active': [user.is_active for user in users],
+  }
+  
+  df = pd.DataFrame(data)
+  
+  # Create an in-memory BytesIO object
+  output = io.BytesIO()
+  # Write the DataFrame to the BytesIO object
+  with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    df.to_excel(writer, sheet_name='Sheet1')
+
+  # Create a Flask response with the Excel file
+  output.seek(0)
+  return send_file(output, download_name='users.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

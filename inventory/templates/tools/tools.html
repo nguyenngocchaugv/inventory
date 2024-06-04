@@ -20,6 +20,8 @@
         </button>
       </form>
       <a class="btn btn-primary" href="{{ url_for('tool.new_tool') }}"><i class="fa-solid fa-plus"></i> New</a>
+      <!-- Export Button -->
+      <a class="btn btn-secondary ml-2" href="{{ url_for('tool.export_tools') }}"><i class="fa-solid fa-download"></i> Export</a>
     </div>
   </div>
   {% if tools.items %}
