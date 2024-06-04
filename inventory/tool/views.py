@@ -115,6 +115,30 @@ def delete_tool(tool_id):
     flash("Tool not found.", "danger")
   return jsonify({'redirect_url': url_for('tool.tools')})
 
+@blueprint.route('/copy_tool/<int:tool_id>', methods=['GET', 'POST'])
+@login_required
+def copy_tool(tool_id):
+  tool = Tool.query.get(tool_id)
+  if tool or not tool.is_deleted:
+    form = ToolForm(request.form, obj=tool)
+    if request.method == 'POST' and form.validate_on_submit():
+      Tool.create(
+        name=form.name.data,
+        type=form.type.data,
+        model=form.model.data,
+        price=form.price.data,
+        quantity=form.quantity.data,
+      )
+      flash(f"Tool {form.name.data} is copied successfully.", "success")
+      return redirect(url_for('tool.tools'))
+    else:
+      form.name.data += " (copy)"
+      flash(f"Tool {tool.name} is copied successfully.", "success")
+      return render_template("tools/tool.html", form=form, mode='Create')
+  else:
+    flash("Tool not found.", "danger")
+    return jsonify({'redirect_url': url_for('tool.tools')})
+
 @blueprint.route('/export', methods=['GET'])
 @login_required
 def export_tools():

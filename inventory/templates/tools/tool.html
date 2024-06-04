@@ -21,6 +21,7 @@
       <div>
         {% if mode == 'View' %}
         <a href="{{ url_for('tool.edit_tool', tool_id=tool.id) }}" class="btn btn-primary">Edit</a>
+        <a href="{{ url_for('tool.copy_tool', tool_id=tool.id) }}" class="btn btn-primary">Copy</a>
         {% elif mode == 'Edit' %}
         {{ form.submit(class="btn btn-primary", value="Update") }}
         <a id="tool-discard-changes-btn" class="btn btn-danger"

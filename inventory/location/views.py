@@ -138,6 +138,41 @@ def delete_location(location_id):
     flash("Location not found.", "danger")
   return jsonify({'redirect_url': url_for('location.locations')})
 
+@blueprint.route('/copy_location/<int:location_id>', methods=['GET', 'POST'])
+@login_required
+def copy_location(location_id):
+  location = Location.query.get(location_id)
+  if location or not location.is_deleted:
+    form = LocationForm(request.form, obj=location)
+    if request.method == 'POST' and form.validate_on_submit():
+      Location.create(
+        name=form.name.data,
+        street=form.street.data,
+        ward=form.ward.data,
+        district=form.district.data,
+        city=form.city.data,
+        principal=form.principal.data,
+        telephone=form.telephone.data,
+        group=form.group.data,
+        num_class_total=form.num_class_total.data,
+        num_f1=form.num_f1.data,
+        num_f2=form.num_f2.data,
+        num_f3=form.num_f3.data,
+        num_infant=form.num_infant.data,
+        office=form.office.data,
+        is_active=form.is_active.data == 'True',
+        location_type_id=form.location_type.data
+      )
+      flash(f"Location {form.name.data} is copied successfully.", "success")
+      return redirect(url_for('location.locations'))
+    else:
+      form.name.data += " (copy)"
+      flash(f"Location {location.name} is copied successfully.", "success")
+      return render_template("locations/location.html", form=form, mode='Create')
+  else:
+    flash("Location not found.", "danger")
+    return jsonify({'redirect_url': url_for('location.locations')})
+
 @blueprint.route('/export', methods=['GET'])
 @login_required
 def export_locations():

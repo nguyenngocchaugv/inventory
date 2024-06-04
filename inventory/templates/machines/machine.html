@@ -20,6 +20,7 @@
     <div class="d-flex justify-content-end gap-2 my-4">
       {% if mode == 'View' %}
       <a href="{{ url_for('machine.edit_machine', machine_id=machine.id) }}" class="btn btn-primary">Edit</a>
+      <a href="{{ url_for('machine.copy_machine', machine_id=machine.id) }}" class="btn btn-primary">Copy</a>
       {% elif mode == 'Edit' %}
       {{ form.submit(class="btn btn-primary", value="Update") }}
       <a id="machine-discard-changes-btn" class="btn btn-danger"

@@ -151,6 +151,32 @@ def delete_machine(machine_id):
     flash("Machine not found.", "danger")
   return jsonify({'redirect_url': url_for('machine.machines')})
 
+@blueprint.route('/copy_machine/<int:machine_id>', methods=['GET', 'POST'])
+@login_required
+def copy_machine(machine_id):
+  machine = Machine.query.get(machine_id)
+  if machine or not machine.is_deleted:
+    form = MachineForm(request.form, obj=machine)
+    if request.method == 'POST' and form.validate_on_submit():
+      Machine.create(
+        name=form.name.data,
+        description=form.description.data,
+        type=form.type.data,
+        serial=form.serial.data,
+        model=form.model.data,
+        price=form.price.data,
+        status=MachineStatusEnum.AVAILABLE.value,
+      )
+      flash(f"Machine {form.name.data} is copied successfully.", "success")
+      return redirect(url_for('machine.machines'))
+    else:
+      form.name.data += " (copy)"
+      flash(f"Machine {machine.name} is copied successfully.", "success")
+      return render_template("machines/machine.html", form=form, mode='Create')
+  else:
+    flash("Machine not found.", "danger")
+    return jsonify({'redirect_url': url_for('machine.machines')})
+
 @blueprint.route('/export', methods=['GET'])
 @login_required
 def export_machines():
