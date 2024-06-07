@@ -144,7 +144,13 @@ def edit_machine(machine_id):
 @login_required
 def delete_machine(machine_id):
   machine = Machine.query.get(machine_id)
+  
   if machine:
+     # Check if the machine is being hired or fixed
+    if machine.status in [MachineStatusEnum.HIRING.value, MachineStatusEnum.FIXING.value]:
+      flash(f"Machine {machine.name} cannot be deleted because it is currently being hired or fixed.", "danger")
+      return jsonify({'redirect_url': url_for('machine.machines')})
+    
     Machine.delete(machine)
     flash(f"Machine {machine.name} is deleted successfully.", "success")
   else:

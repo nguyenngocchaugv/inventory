@@ -21,6 +21,11 @@
       {% if mode == 'View' %}
       <a href="{{ url_for('location.edit_location', location_id=location.id) }}" class="btn btn-primary">Edit</a>
       <a href="{{ url_for('location.copy_location', location_id=location.id) }}" class="btn btn-primary">Copy</a>
+      <a id="locations-delete-btn" class="btn btn-danger"
+        data-url="{{ url_for('location.delete_location', location_id=location.id) }}" data-bs-toggle="modal"
+        data-bs-target="#locationDeleteModal">
+        Delete
+      </a>
       {% elif mode == 'Edit' %}
       {{ form.submit(class="btn btn-primary", value="Update") }}
       <a id="location-discard-changes-btn" class="btn btn-danger"
@@ -161,6 +166,26 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
         <a href="#" class="btn btn-danger" id="location-on-discard-changes-btn">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="locationDeleteModal" tabindex="-1" aria-labelledby="locationDeleteModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="locationDeleteModalLabel">Delete Location</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this location?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" class="btn btn-danger" id="locations-on-confirm-delete-btn">Delete</a>
       </div>
     </div>
   </div>

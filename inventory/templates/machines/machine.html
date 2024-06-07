@@ -21,6 +21,13 @@
       {% if mode == 'View' %}
       <a href="{{ url_for('machine.edit_machine', machine_id=machine.id) }}" class="btn btn-primary">Edit</a>
       <a href="{{ url_for('machine.copy_machine', machine_id=machine.id) }}" class="btn btn-primary">Copy</a>
+      {% if form.status.data == 'AVAILABLE' %}
+      <a id="machines-delete-btn" class="btn btn-danger"
+        data-url="{{ url_for('machine.delete_machine', machine_id=machine.id) }}" data-bs-toggle="modal"
+        data-bs-target="#machineDeleteModal">
+        Delete
+      </a>
+      {% endif %}
       {% elif mode == 'Edit' %}
       {{ form.submit(class="btn btn-primary", value="Update") }}
       <a id="machine-discard-changes-btn" class="btn btn-danger"
@@ -97,6 +104,26 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
         <a href="#" class="btn btn-danger" id="machine-on-discard-changes-btn">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="machineDeleteModal" tabindex="-1" aria-labelledby="machineDeleteModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="machineDeleteModalLabel">Delete Machine</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this machine?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" class="btn btn-danger" id="machines-on-confirm-delete-btn">Delete</a>
       </div>
     </div>
   </div>

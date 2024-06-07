@@ -22,6 +22,11 @@
         {% if mode == 'View' %}
         <a href="{{ url_for('tool.edit_tool', tool_id=tool.id) }}" class="btn btn-primary">Edit</a>
         <a href="{{ url_for('tool.copy_tool', tool_id=tool.id) }}" class="btn btn-primary">Copy</a>
+        <a id="tools-delete-btn" class="btn btn-danger"
+          data-url="{{ url_for('tool.delete_tool', tool_id=tool.id) }}" data-bs-toggle="modal"
+          data-bs-target="#toolDeleteModal">
+          Delete
+        </a>
         {% elif mode == 'Edit' %}
         {{ form.submit(class="btn btn-primary", value="Update") }}
         <a id="tool-discard-changes-btn" class="btn btn-danger"
@@ -85,6 +90,25 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
         <a href="#" class="btn btn-danger" id="tool-on-discard-changes-btn">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="toolDeleteModal" tabindex="-1" aria-labelledby="toolDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="toolDeleteModalLabel">Delete Tool</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this tool?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" class="btn btn-danger" id="tools-on-confirm-delete-btn">Delete</a>
       </div>
     </div>
   </div>
