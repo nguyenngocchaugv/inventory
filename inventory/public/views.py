@@ -59,7 +59,9 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.dashboard'))
     # Store the next URL in the session
-    session['next'] = request.args.get('next')
+    next_page = request.args.get('next')
+    if next_page:
+        session['next'] = next_page
 
     form = LoginForm(request.form)
     # Check the form is valid on submission (i.e., we're in a POST request)
@@ -68,9 +70,8 @@ def login():
         login_user(form.user)
         flash("You are logged in.", "success")
         # If login successful, redirect to next URL or default URL
-        next_page = session.get('next', '/')
-        session['next'] = None  # clear the next URL stored in the session
-        return redirect(next_page)
+        next_page = session.pop('next', None)
+        return redirect(next_page or '/')
     else:
         flash_errors(form)
     return render_template("public/login.html", form=form)

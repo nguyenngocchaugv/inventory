@@ -2,25 +2,16 @@
 """Public section, including homepage and signup."""
 from flask import (
     Blueprint,
-    current_app,
-    flash,
     jsonify,
-    redirect,
     render_template,
-    request,
-    url_for,
 )
-from flask_login import login_required, login_user, logout_user
+from flask_login import login_required
 from sqlalchemy import desc, extract, func
 
-from inventory.extensions import login_manager, db
+from inventory.extensions import db
 from inventory.location.models import Location
 from inventory.machine.models import Machine, RentInvoice
-from inventory.public.forms import LoginForm
 from inventory.tool.models import InvoiceItem, SellInvoice, Tool
-from inventory.user.forms import RegisterForm
-from inventory.user.models import User
-from inventory.utils import flash_errors
 
 blueprint = Blueprint("dashboard", __name__, static_folder="../static")
 

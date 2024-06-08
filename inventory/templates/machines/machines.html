@@ -37,6 +37,7 @@
           <th>Model</th>
           <th>Price ($)</th>
           <th>Status</th>
+          <th>Hired By</th>
           <th>Created By</th>
           <th>Updated By</th>
           <th>Actions</th>
@@ -62,6 +63,7 @@
             <span class="badge bg-secondary">{{ machine.status }}</span>
             {% endif %}
           </td>
+          <td>{{ machine.location_name|default('', true) }}</td>
           <td>{{ machine.created_by_email }}</td>
           <td>{{ machine.updated_by_email }}</td>
           <td>

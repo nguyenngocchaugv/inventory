@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Location views."""
+from datetime import datetime
 import io
-import os
 from flask import (
   Blueprint,
   flash,
@@ -132,8 +132,11 @@ def edit_location(location_id):
 def delete_location(location_id):
   location = Location.query.get(location_id)
   if location:
+    # Rename the location before deleting it because of foreign key constraints
+    old_name = location.name
+    location.name = f"{old_name}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     Location.delete(location)
-    flash(f"Location {location.name} is deleted successfully.", "success")
+    flash(f"Location {old_name} is deleted successfully.", "success")
   else:
     flash("Location not found.", "danger")
   return jsonify({'redirect_url': url_for('location.locations')})

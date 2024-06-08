@@ -312,16 +312,16 @@ def seed():
   
   # Create Machines
   machines = [
-    {'name': 'Printer', 'description': 'Printer Description', 'type': 'Printer', 'serial': 'PRINTER-001', 'model': 'HP', 'price': 100.00, 'status': MachineStatusEnum.AVAILABLE.value},
-    {'name': 'Scanner', 'description': 'Scanner Description', 'type': 'Scanner', 'serial': 'SCANNER-001', 'model': 'Canon', 'price': 50.00, 'status': MachineStatusEnum.AVAILABLE.value},
-    {'name': 'Projector', 'description': 'Projector Description', 'type': 'Projector', 'serial': 'PROJECTOR-001', 'model': 'Epson', 'price': 200.00, 'status': MachineStatusEnum.AVAILABLE.value},
-    {'name': 'Laptop', 'description': 'Laptop Description', 'type': 'Laptop', 'serial': 'LAPTOP-001', 'model': 'Dell', 'price': 500.00, 'status': MachineStatusEnum.AVAILABLE.value},
-    {'name': 'Desktop', 'description': 'Desktop Description', 'type': 'Desktop', 'serial': 'DESKTOP-001', 'model': 'HP', 'price': 400.00, 'status': MachineStatusEnum.AVAILABLE.value},
+    {'name': 'Printer', 'description': 'Printer Description', 'type': 'Printer', 'serial': 'PRINTER-001', 'model': 'HP', 'price': 100.00, 'status': MachineStatusEnum.HIRING.value},
+    {'name': 'Scanner', 'description': 'Scanner Description', 'type': 'Scanner', 'serial': 'SCANNER-001', 'model': 'Canon', 'price': 50.00, 'status': MachineStatusEnum.HIRING.value},
+    {'name': 'Projector', 'description': 'Projector Description', 'type': 'Projector', 'serial': 'PROJECTOR-001', 'model': 'Epson', 'price': 200.00, 'status': MachineStatusEnum.HIRING.value},
+    {'name': 'Laptop', 'description': 'Laptop Description', 'type': 'Laptop', 'serial': 'LAPTOP-001', 'model': 'Dell', 'price': 500.00, 'status': MachineStatusEnum.HIRING.value},
+    {'name': 'Desktop', 'description': 'Desktop Description', 'type': 'Desktop', 'serial': 'DESKTOP-001', 'model': 'HP', 'price': 400.00, 'status': MachineStatusEnum.HIRING.value},
     {'name': 'Tablet', 'description': 'Tablet Description', 'type': 'Tablet', 'serial': 'TABLET-001', 'model': 'Samsung', 'price': 300.00, 'status': MachineStatusEnum.AVAILABLE.value},
     {'name': 'Smartphone', 'description': 'Smartphone Description', 'type': 'Smartphone', 'serial': 'SMARTPHONE-001', 'model': 'Apple', 'price': 600.00, 'status': MachineStatusEnum.AVAILABLE.value},
-    {'name': 'Camera', 'description': 'Camera Description', 'type': 'Camera', 'serial': 'CAMERA-001', 'model': 'Canon', 'price': 700.00, 'status': MachineStatusEnum.AVAILABLE.value},
+    {'name': 'Camera', 'description': 'Camera Description', 'type': 'Camera', 'serial': 'CAMERA-001', 'model': 'Canon', 'price': 700.00, 'status': MachineStatusEnum.HIRING.value},
     {'name': 'Microphone', 'description': 'Microphone Description', 'type': 'Microphone', 'serial': 'MICROPHONE-001', 'model': 'Blue', 'price': 800.00, 'status': MachineStatusEnum.FIXING.value},
-    {'name': 'Speaker', 'description': 'Speaker Description', 'type': 'Speaker', 'serial': 'SPEAKER-001', 'model': 'Bose', 'price': 900.00, 'status': MachineStatusEnum.HIRING.value},
+    {'name': 'Speaker', 'description': 'Speaker Description', 'type': 'Speaker', 'serial': 'SPEAKER-001', 'model': 'Bose', 'price': 900.00, 'status': MachineStatusEnum.AVAILABLE.value},
     # Add more machines...
   ]
   

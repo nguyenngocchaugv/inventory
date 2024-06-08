@@ -68,7 +68,7 @@ flask db upgrade
 Seed Data
 Run the custom command to seed data, please aware that it will clear all existing data
 
-```text
+```bash
 flask seed
 ```
 

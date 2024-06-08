@@ -11,10 +11,12 @@ from flask import (
   url_for,
   request
 )
+from inventory.extensions import db
 from flask import current_app
 from flask_login import login_required
 import pandas as pd
-from sqlalchemy import desc
+from sqlalchemy import and_, desc
+from inventory.location.models import Location
 from inventory.machine.forms import MachineForm
 from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice, RentInvoiceHistory, RentInvoiceStatusEnum
 from inventory.user.models import User
@@ -33,10 +35,17 @@ def machines():
   
   # Query the User table and create a dictionary where the keys are user IDs and the values are user emails
   users = {user.id: user.email for user in User.query.all()}
+  
+   # Query the RentInvoice and Location tables and create a dictionary where the keys are machine IDs and the values are location names
+  locations = db.session.query(RentInvoice.machine_id, Location.name).join(Location, RentInvoice.location_id == Location.id).filter(RentInvoice.status == RentInvoiceStatusEnum.ACTIVE.value).all()
+  current_app.logger.info(locations)
+  locations = {location[0]: location[1] for location in locations}
+  
   # For each machine, get the emails of the users who created and updated it from the dictionary
   for machine in machines:  
     machine.created_by_email = users.get(machine.created_by)
     machine.updated_by_email = users.get(machine.updated_by)
+    machine.location_name = locations.get(machine.id)
     
   return render_template("machines/machines.html", machines=machines)
 

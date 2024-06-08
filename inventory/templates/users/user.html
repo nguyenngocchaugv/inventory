@@ -20,9 +20,20 @@
     <div class="d-flex justify-content-end gap-2 my-4">
       <div>
         {% if mode == 'View' %}
-          {% if current_user.role.name == 'SuperAdmin' or (current_user.role.name == 'Admin'
-                      and user.role.name != 'Admin' and current_user.id != user.id) %}
-            <a href="{{ url_for('user.edit_user', user_id=user.id) }}" class="btn btn-primary">Edit</a>
+        {% if current_user.role.name == 'SuperAdmin' or (current_user.role.name == 'Admin'
+        and user.role.name != 'Admin' and current_user.id != user.id) %}
+        <a href="{{ url_for('user.edit_user', user_id=user.id) }}" class="btn btn-primary">Edit</a>
+        {% endif %}
+          {% if current_user.is_authenticated
+          and (current_user.role.name == 'SuperAdmin'
+          or (current_user.role.name == 'Admin'
+          and user.role.name != 'Admin' and current_user.id != user.id))
+          %}
+          <a id="users-delete-btn" class="btn btn-danger"
+            data-url="{{ url_for('user.delete_user', user_id=user.id) }}" data-bs-toggle="modal"
+            data-bs-target="#userDeleteModal">
+            Delete
+          </a>
           {% endif %}
         {% elif mode == 'Edit' %}
         {{ form.submit(class="btn btn-primary", value="Update") }}
@@ -69,20 +80,20 @@
         </div>
       </div>
       {% if mode != 'View' %}
-        <div class="col-12 col-md-6 mb-3">
-          <div class="form-group">
-            {{ form.password.label(class="form-label required") }}
-            {{ form.password(placeholder="Password", class="form-control", required=mode != 'View', disabled=mode ==
-            'View') }}
-          </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.password.label(class="form-label required") }}
+          {{ form.password(placeholder="Password", class="form-control", required=mode != 'View', disabled=mode ==
+          'View') }}
         </div>
-        <div class="col-12 col-md-6 mb-3">
-          <div class="form-group">
-            {{ form.confirm.label(class="form-label required") }}
-            {{ form.confirm(placeholder="Verify password", class="form-control", required=mode != 'View', disabled=mode ==
-            'View') }}
-          </div>
+      </div>
+      <div class="col-12 col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.confirm.label(class="form-label required") }}
+          {{ form.confirm(placeholder="Verify password", class="form-control", required=mode != 'View', disabled=mode ==
+          'View') }}
         </div>
+      </div>
       {% endif %}
       <div class="col-12 col-md-6 mb-3">
         <div class="form-group">
@@ -123,13 +134,15 @@
       <div class="col-12 col-md-6 mb-3">
         <div class="form-group">
           {{ form.position.label(class="form-label required") }}
-          {{ form.position(placeholder="Position", class="form-control", required=mode != 'View', disabled=mode == 'View') }}
+          {{ form.position(placeholder="Position", class="form-control", required=mode != 'View', disabled=mode ==
+          'View') }}
         </div>
       </div>
       <div class="col-12 col-md-6 mb-3">
         <div class="form-group">
           {{ form.work_duration.label(class="form-label required") }}
-          {{ form.work_duration(placeholder="Work Duration", class="form-control", required=mode != 'View', disabled=mode ==
+          {{ form.work_duration(placeholder="Work Duration", class="form-control", required=mode != 'View',
+          disabled=mode ==
           'View') }}
         </div>
       </div>
@@ -167,6 +180,25 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
         <a href="#" class="btn btn-danger" id="user-on-discard-changes-btn">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="userDeleteModal" tabindex="-1" aria-labelledby="userDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userDeleteModalLabel">Delete User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this user?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" class="btn btn-danger" id="users-on-confirm-delete-btn">Delete</a>
       </div>
     </div>
   </div>
