@@ -9,7 +9,7 @@ from flask import Flask, render_template
 from jinja2 import Undefined
 from sqlalchemy import MetaData
 
-from inventory import commands, public, user, location, machine, tool
+from inventory import commands, public, report, user, location, machine, tool
 from inventory.extensions import (
     bcrypt,
     cache,
@@ -57,7 +57,7 @@ def register_extensions(app):
     db.init_app(app)
     csrf_protect.init_app(app)
     login_manager.init_app(app)
-    debug_toolbar.init_app(app)
+    # debug_toolbar.init_app(app)
     migrate.init_app(app, db)
     flask_static_digest.init_app(app)
     return None
@@ -73,6 +73,7 @@ def register_blueprints(app):
     app.register_blueprint(machine.rent_invoice_views.blueprint)
     app.register_blueprint(tool.views.blueprint)
     app.register_blueprint(tool.sell_invoice_views.blueprint)
+    app.register_blueprint(report.views.blueprint)
     return None
 
 

@@ -15,7 +15,7 @@ from inventory.extensions import db
 from flask import current_app
 from flask_login import login_required
 import pandas as pd
-from sqlalchemy import and_, desc
+from sqlalchemy import desc
 from inventory.location.models import Location
 from inventory.machine.forms import MachineForm
 from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice, RentInvoiceHistory, RentInvoiceStatusEnum
@@ -38,7 +38,6 @@ def machines():
   
    # Query the RentInvoice and Location tables and create a dictionary where the keys are machine IDs and the values are location names
   locations = db.session.query(RentInvoice.machine_id, Location.name).join(Location, RentInvoice.location_id == Location.id).filter(RentInvoice.status == RentInvoiceStatusEnum.ACTIVE.value).all()
-  current_app.logger.info(locations)
   locations = {location[0]: location[1] for location in locations}
   
   # For each machine, get the emails of the users who created and updated it from the dictionary

@@ -27,6 +27,9 @@ class RentInvoice(PkModel):
   status = Column(db.String(10), nullable=False)
   price = Column(db.Numeric(precision=10, scale=2), nullable=False)
   
+  machine_type = Column(db.String(10), nullable=False)
+  machine_model = Column(db.String(10), nullable=False)
+  
   location_id = reference_col("locations", nullable=False)
   location = relationship("Location", backref="rent_invoices")
   

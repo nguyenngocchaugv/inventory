@@ -342,14 +342,14 @@ def seed():
   
   # Create rent invoices
   rent_invoices = [
-    {'name': 'Rent Invoice 1', 'serial': 'RENT-001', 'start_date': datetime.strptime('2024-01-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-02-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 100.00, 'location_id': 1, 'machine_id': 1, 'user_id': 1},
-    {'name': 'Rent Invoice 2', 'serial': 'RENT-002', 'start_date': datetime.strptime('2024-02-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-03-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 200.00, 'location_id': 2, 'machine_id': 2, 'user_id': 2},
-    {'name': 'Rent Invoice 3', 'serial': 'RENT-003', 'start_date': datetime.strptime('2024-03-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-04-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 300.00, 'location_id': 3, 'machine_id': 3, 'user_id': 3},
-    {'name': 'Rent Invoice 4', 'serial': 'RENT-004', 'start_date': datetime.strptime('2024-04-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-05-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 400.00, 'location_id': 4, 'machine_id': 4, 'user_id': 4},
-    {'name': 'Rent Invoice 5', 'serial': 'RENT-005', 'start_date': datetime.strptime('2024-05-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-06-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 500.00, 'location_id': 5, 'machine_id': 5, 'user_id': 5},
-    {'name': 'Rent Invoice 6', 'serial': 'RENT-006', 'start_date': datetime.strptime('2024-06-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-06-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.COMPLETED.value, 'price': 600.00, 'location_id': 6, 'machine_id': 6, 'user_id': 1},
-    {'name': 'Rent Invoice 7', 'serial': 'RENT-007', 'start_date': datetime.strptime('2024-07-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-08-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.CANCELLED.value, 'price': 700.00, 'location_id': 7, 'machine_id': 7, 'user_id': 2},
-    {'name': 'Rent Invoice 8', 'serial': 'RENT-008', 'start_date': datetime.strptime('2024-08-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-09-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 800.00, 'location_id': 8, 'machine_id': 8, 'user_id': 3},
+    {'name': 'Rent Invoice 1', 'serial': 'RENT-001', 'start_date': datetime.strptime('2024-01-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-02-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 100.00, 'machine_type': 'Printer', 'machine_model': 'HP', 'location_id': 1, 'machine_id': 1, 'user_id': 1},
+    {'name': 'Rent Invoice 2', 'serial': 'RENT-002', 'start_date': datetime.strptime('2024-02-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-03-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 200.00, 'machine_type': 'Scanner', 'machine_model': 'Canon', 'location_id': 2, 'machine_id': 2, 'user_id': 2},
+    {'name': 'Rent Invoice 3', 'serial': 'RENT-003', 'start_date': datetime.strptime('2024-03-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-04-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 300.00, 'machine_type': 'Projector', 'machine_model': 'Epson', 'location_id': 3, 'machine_id': 3, 'user_id': 3},
+    {'name': 'Rent Invoice 4', 'serial': 'RENT-004', 'start_date': datetime.strptime('2024-04-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-05-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 400.00, 'machine_type': 'Laptop', 'machine_model': 'Dell', 'location_id': 4, 'machine_id': 4, 'user_id': 4},
+    {'name': 'Rent Invoice 5', 'serial': 'RENT-005', 'start_date': datetime.strptime('2024-05-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-06-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 500.00, 'machine_type': 'Desktop', 'machine_model': 'HP', 'location_id': 5, 'machine_id': 5, 'user_id': 5},
+    {'name': 'Rent Invoice 6', 'serial': 'RENT-006', 'start_date': datetime.strptime('2024-06-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-06-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.COMPLETED.value, 'price': 600.00, 'machine_type': 'Tablet', 'machine_model': 'Samsung', 'location_id': 6, 'machine_id': 6, 'user_id': 1},
+    {'name': 'Rent Invoice 7', 'serial': 'RENT-007', 'start_date': datetime.strptime('2024-07-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-08-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.CANCELLED.value, 'price': 700.00, 'machine_type': 'Smartphone', 'machine_model': 'Apple', 'location_id': 7, 'machine_id': 7, 'user_id': 2},
+    {'name': 'Rent Invoice 8', 'serial': 'RENT-008', 'start_date': datetime.strptime('2024-08-01', '%Y-%m-%d'), 'end_date': datetime.strptime('2024-09-01', '%Y-%m-%d'), 'status': RentInvoiceStatusEnum.ACTIVE.value, 'price': 800.00, 'machine_type': 'Camera', 'machine_model': 'Canon', 'location_id': 8, 'machine_id': 8, 'user_id': 3},
     # Add more rent invoices...
   ]
   
@@ -361,6 +361,8 @@ def seed():
       end_date=rent_invoice['end_date'],
       status=rent_invoice['status'],
       price=rent_invoice['price'],
+      machine_type=rent_invoice['machine_type'],
+      machine_model=rent_invoice['machine_model'],
       location_id=rent_invoice['location_id'],
       machine_id=rent_invoice['machine_id'],
       user_id=rent_invoice['user_id'],

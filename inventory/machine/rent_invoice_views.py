@@ -74,6 +74,8 @@ def new_rent_invoice():
       end_date=form.end_date.data,
       status=form.status.data,
       price=form.price.data,
+      machine_type=form.machine.type.data,
+      machine_model=form.machine.model.data,
       user_id=int(form.user.data),
       machine_id=int(form.machine.data),
       location_id=int(form.location.data)
@@ -143,6 +145,8 @@ def export_rent_invoices():
     'end_date': invoice.end_date,
     'status': invoice.status,
     'price': invoice.price,
+    'machine_type': invoice.machine_type,
+    'machine_model': invoice.machine_model,
     'location_id': invoice.location_id,
     'machine_id': invoice.machine_id,
     'user_id': invoice.user_id,
