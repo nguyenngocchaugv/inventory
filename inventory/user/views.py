@@ -14,7 +14,7 @@ from flask import (
 from flask_login import current_user, login_required
 import pandas as pd
 from sqlalchemy import and_, desc
-from inventory.user.forms import UserForm
+from inventory.user.forms import EditUserForm, UserForm
 from inventory.user.models import Role, RoleEnum, User
 from inventory.utils import flash_errors
 
@@ -99,9 +99,9 @@ def edit_user(user_id):
     return redirect(url_for('user.users'))
 
   if request.method == 'POST':
-    form = UserForm(request.form)
+    form = EditUserForm(request.form)
   else:
-    form = UserForm(obj=user)
+    form = EditUserForm(obj=user)
     
   if form.validate_on_submit():
     user.update( 
@@ -110,7 +110,6 @@ def edit_user(user_id):
       email=form.email.data,
       telephone=form.telephone.data,
       username=form.username.data,
-      password=form.password.data,
       street=form.street.data,
       ward=form.ward.data,
       district=form.district.data,
