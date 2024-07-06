@@ -2,10 +2,11 @@
 from enum import Enum
 from flask_wtf import FlaskForm
 from sqlalchemy import and_
-from wtforms import SelectField
+from wtforms import DateTimeField, SelectField
 from wtforms.validators import DataRequired
 
 from inventory.location.models import Location, LocationType, LocationTypeEnum
+from inventory.machine.models import Machine
 
 class SchoolReportTypeEnum(Enum):
   SELL = 'Sell'
@@ -24,3 +25,26 @@ class SchoolReportForm(FlaskForm):
     
     city_names = list(set([location.city for location in all_schools]))
     self.city.choices = [(city_name, city_name) for city_name in city_names]
+    
+class MachineAvailabilityForm(FlaskForm):
+  serial = SelectField('Serial', coerce=str, validators=[DataRequired()])
+  model = SelectField('Model', coerce=str, validators=[DataRequired()])
+  start_date = DateTimeField('Start Date', format='%Y-%m-%d', validators=[DataRequired()])
+  end_date = DateTimeField('End Date', format='%Y-%m-%d', validators=[DataRequired()])
+
+  def __init__(self, *args, **kwargs):
+    super(MachineAvailabilityForm, self).__init__(*args, **kwargs)
+
+    all_machines = Machine.query.filter(Machine.is_deleted == False).all()
+    
+    # Extract unique serials and models
+    serials = [("All", "All")] + list(set((machine.serial, machine.serial) for machine in all_machines))
+    models = [("All", "All")] + list(set((machine.model, machine.model) for machine in all_machines))
+    
+    # Sort the lists if desired
+    serials.sort(key=lambda x: x[1])
+    models.sort(key=lambda x: x[1])
+    
+    # Set the choices for the serial and model fields
+    self.serial.choices = serials
+    self.model.choices = models

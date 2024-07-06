@@ -3,22 +3,25 @@
 import io
 from flask import (
     Blueprint,
+    current_app,
     flash,
     redirect,
     render_template,
     request,
     send_file,
+    session,
     url_for,
 )
 import pandas as pd
+from sqlalchemy import and_, or_
 from inventory.extensions import (
   db,
 )
 from flask_login import login_required
 
 from inventory.location.models import Location
-from inventory.machine.models import RentInvoice
-from inventory.report.forms import SchoolReportForm, SchoolReportTypeEnum
+from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice
+from inventory.report.forms import MachineAvailabilityForm, SchoolReportForm, SchoolReportTypeEnum
 from inventory.tool.models import InvoiceItem, SellInvoice
 
 blueprint = Blueprint("report", __name__, static_folder="../static")
@@ -147,3 +150,123 @@ def export_schools():
   # Create a Flask response with the Excel file
   output.seek(0)
   return send_file(output, download_name='schools.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+def get_filtered_machines(start_date, end_date, selected_serial, selected_model):
+  """Get filtered machines for the given date range, serial, and model."""
+  # Base query for AVAILABLE machines
+  base_query = Machine.query.filter(Machine.status == MachineStatusEnum.AVAILABLE.value)
+  
+  # Apply filters for selected serial and model if they are not 'All'
+  if selected_serial != 'All':
+    base_query = base_query.filter(Machine.serial == selected_serial)
+  if selected_model != 'All':
+    base_query = base_query.filter(Machine.model == selected_model)
+    
+  # Query for HIRING machines with future start dates
+  hiring_machines_query = Machine.query.join(RentInvoice, Machine.id == RentInvoice.machine_id).filter(
+    and_(
+      Machine.status == MachineStatusEnum.HIRING.value,
+      or_(
+        RentInvoice.start_date > end_date,  # Case 1: Future start date
+        RentInvoice.end_date < start_date   # Case 2: Ends before start date
+      )
+    )
+  )
+  
+  # Apply the same filters for serial and model to the hiring machines query if not 'All'
+  if selected_serial != 'All':
+    hiring_machines_query = hiring_machines_query.filter(Machine.serial == selected_serial)
+  if selected_model != 'All':
+    hiring_machines_query = hiring_machines_query.filter(Machine.model == selected_model)
+  
+  # Combine queries
+  available_machines = base_query.union(hiring_machines_query).all()
+  
+  # Convert the list of machines to a list of dictionaries
+  machines_report = [
+    {"serial": machine.serial, "model": machine.model, "status": machine.status, "description": machine.description}
+    for machine in available_machines
+  ]
+  
+  return machines_report
+
+@blueprint.route("/machine_availability", methods=["GET", "POST"])
+@login_required
+def machine_availability():
+  """List available machines in the store for a specific date range."""
+  form = MachineAvailabilityForm()  # This form should have start_date and end_date fields
+  available_machines = []
+  machines_report = []
+
+  if form.validate_on_submit():
+    start_date = form.start_date.data
+    end_date = form.end_date.data
+    selected_serial = form.serial.data
+    selected_model = form.model.data
+
+    # Get the filtered machines for the given date range, serial, and model
+    machines_report = get_filtered_machines(start_date, end_date, selected_serial, selected_model)
+    
+  else:
+    flash("Please enter valid dates.", "danger")
+  return render_template("reports/machine_availability.html", form=form, machines=machines_report)
+
+@blueprint.route('/export_machine_availability', methods=['GET'])
+@login_required
+def export_machine_availability():
+  """Export filtered machines to Excel."""
+  
+  serial = request.args.get('serial')
+  model = request.args.get('model')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  
+  # Get the filtered machines for the given date range, serial, and model
+  machines_report = get_filtered_machines(start_date, end_date, serial, model)
+  
+  if not machines_report:
+    flash("No data to export.", "danger")
+    return redirect(url_for('report.machine_availability'))
+  
+  # Convert the list of dictionaries to a pandas DataFrame
+  df = pd.DataFrame(machines_report)
+  
+  # Create an in-memory BytesIO object
+  output = io.BytesIO()
+  
+  # Write the DataFrame to the BytesIO object using ExcelWriter
+  with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    # Rename the DataFrame columns
+    df.columns = ['Serial', 'Model', 'Status', 'Description']
+    
+    # Write the DataFrame to the Excel file
+    df.to_excel(writer, sheet_name='Available Machines In Store', startrow=7)
+    
+    workbook = writer.book
+    worksheet = writer.sheets['Available Machines In Store']
+    
+    # Create a format for the cell borders
+    border_format = workbook.add_format({'border': 1})
+    
+    # Apply the cell borders format to the DataFrame area
+    worksheet.conditional_format('A8:{}{}'.format(chr(65+len(df.columns)), len(df)+8), {'type': 'no_errors', 'format': border_format})
+    
+    # Create a format for the title
+    title_format = workbook.add_format({'bold': True, 'font_size': 18})
+    
+    # Write the title and details to the Excel file
+    worksheet.write('A1', 'Available Machines Report', title_format)
+    worksheet.write('A3', 'Serial:')
+    worksheet.write('B3', serial)
+    worksheet.write('D3', 'Model:')
+    worksheet.write('E3', model)
+    worksheet.write('A5', 'Start Date:')
+    worksheet.write('B5', start_date)
+    worksheet.write('D5', 'End Date:')
+    worksheet.write('E5', end_date)
+ 
+  # Reset the pointer of the BytesIO object to the beginning
+  output.seek(0)
+  
+  # Create a Flask response with the Excel file
+  return send_file(output, download_name='available-machine.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
