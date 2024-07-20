@@ -83,3 +83,12 @@ class SoldToolsForm(FlaskForm):
     if self.start_date.data and field.data:
       if field.data < self.start_date.data:
         raise ValidationError("End date should not be earlier than start date.")
+      
+class RentedMachinesForm(FlaskForm):
+  start_date = DateTimeField('Start Date', format='%Y-%m-%d', validators=[DataRequired()])
+  end_date = DateTimeField('End Date', format='%Y-%m-%d', validators=[DataRequired()])
+  
+  def validate_end_date(self, field):
+    if self.start_date.data and field.data:
+      if field.data < self.start_date.data:
+        raise ValidationError("End date should not be earlier than start date.")

@@ -10,7 +10,6 @@ from flask import (
     render_template,
     request,
     send_file,
-    session,
     url_for,
 )
 import pandas as pd
@@ -21,8 +20,8 @@ from inventory.extensions import (
 from flask_login import login_required
 
 from inventory.location.models import Location
-from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice
-from inventory.report.forms import MachineAvailabilityForm, SchoolReportForm, SchoolReportTypeEnum, SoldToolsForm
+from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice, RentInvoiceHistory
+from inventory.report.forms import MachineAvailabilityForm, RentedMachinesForm, SchoolReportForm, SchoolReportTypeEnum, SoldToolsForm
 from inventory.tool.models import InvoiceItem, SellInvoice
 from inventory.utils import flash_errors
 
@@ -311,10 +310,10 @@ def get_sold_tools(start_date, end_date, selected_type, selected_model):
   tools_report = [
     {
       "type": tool.tool_type,
-     "model": tool.tool_model,
-     "quantity": tool.quantity,
-     "price": tool.price,
-     "sold_date": tool.invoice.issue_date.strftime('%m-%d-%Y')
+      "model": tool.tool_model,
+      "quantity": tool.quantity,
+      "price": tool.price,
+      "sold_date": tool.invoice.issue_date.strftime('%m-%d-%Y')
     }
     for tool in tools_report
   ]
@@ -344,14 +343,13 @@ def export_sold_tools():
   output = io.BytesIO()
   
   with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-     # Rename the DataFrame columns
+    # Rename the DataFrame columns
     df.columns = ['Type', 'Model', 'Quantity', 'Price', 'Sold Date']
     
     df.to_excel(writer, sheet_name='Sold Tools', startrow=7)
     workbook = writer.book
     worksheet = writer.sheets['Sold Tools']
     
-    title_format = workbook.add_format({'bold': True, 'font_size': 14})
      # Create a format for the title
     title_format = workbook.add_format({'bold': True, 'font_size': 18})
     
@@ -371,4 +369,112 @@ def export_sold_tools():
     
   output.seek(0)
     
-  return send_file(output, download_name='sold_tools.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+  return send_file(
+    output,
+    download_name='sold_tools.xlsx',
+    as_attachment=True,
+    mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  )
+  
+def get_filtered_rent_invoices_with_status_history(start_date, end_date):
+  #Query RentInvoice records based on date range
+  rent_invoices = db.session.query(RentInvoice).filter(
+    and_(
+      RentInvoice.start_date >= start_date,
+      RentInvoice.start_date <= end_date
+    )
+  ).all()
+  
+  # Aggregate RentInvoiceHistory statuses for each RentInvoice
+  for invoice in rent_invoices:
+    histories = RentInvoiceHistory.query.filter_by(rent_invoice_id=invoice.id).all()
+
+    # Compile a list of unique statuses from the histories
+    status_list = list(set([history.status for history in histories]))
+    
+    # Merge Results - Attach the status list to the invoice object
+    setattr(invoice, 'status_history', status_list)
+
+  return rent_invoices
+
+@blueprint.route("/rented_machines", methods=["GET", "POST"])
+@login_required
+def rented_machines():
+  """List rented machines in the store."""
+  form = RentedMachinesForm()
+  rent_invoices = []
+  
+  if form.validate_on_submit():
+    start_date = form.start_date.data
+    end_date = form.end_date.data
+    
+    rent_invoices = get_filtered_rent_invoices_with_status_history(start_date, end_date)
+  else:
+    flash_errors(form)
+    
+  return render_template("reports/rented_machines.html", form=form, rent_invoices=rent_invoices)
+
+@blueprint.route('/export_rented_machines', methods=['GET'])
+@login_required
+def export_rented_machines():
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  
+  # Convert start_date and end_date from string to datetime objects
+  start_date = datetime.strptime(start_date.split(' ')[0], '%Y-%m-%d') if start_date else None
+  end_date = datetime.strptime(end_date.split(' ')[0], '%Y-%m-%d') if end_date else None
+  
+  rent_invoices = get_filtered_rent_invoices_with_status_history(start_date, end_date)
+  
+  if not rent_invoices:
+    flash("No data to export.", "danger")
+    return redirect(url_for('report.rent_machines'))
+  
+  formatted_rent_invoices = [
+    {
+      "name": invoice.name,
+      "serial": invoice.serial,
+      "location_name": invoice.location.name,
+      "start_date": invoice.start_date.strftime('%m-%d-%Y'),
+      "end_date": invoice.end_date.strftime('%m-%d-%Y'),
+      "status_history": invoice.status_history
+    }
+    for invoice in rent_invoices
+  ]
+  
+  df = pd.DataFrame(formatted_rent_invoices)
+  
+  output = io.BytesIO()
+  
+  with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    # Rename the DataFrame columns
+    df.columns = ['Name', 'Serial', 'Location Name', 'Start Date', 'End Date','Statuses']
+    
+    # Format the status_history column as a string
+    df['Statuses'] = df['Statuses'].apply(lambda x: ', '.join(x))
+
+    
+    df.to_excel(writer, sheet_name='Rented Machines', startrow=5)
+    workbook = writer.book
+    worksheet = writer.sheets['Rented Machines']
+    
+    title_format = workbook.add_format({'bold': True, 'font_size': 18})
+    
+    worksheet.write('A1', 'Rented Machines Report', title_format)
+    worksheet.write('A3', 'Start Date:')
+    worksheet.write('B3', start_date.strftime('%m-%d-%Y'))
+    worksheet.write('D3', 'End Date:')
+    worksheet.write('E3', end_date.strftime('%m-%d-%Y'))
+    
+    border_format = workbook.add_format({'border': 1})
+    worksheet.conditional_format('A6:G{}'.format(len(df)+6), {'type': 'no_errors', 'format': border_format})
+    
+  output.seek(0)
+    
+  return send_file(
+    output,
+    download_name='rented_machines.xlsx',
+    as_attachment=True,
+    mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  )
+  

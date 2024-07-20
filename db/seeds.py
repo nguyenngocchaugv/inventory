@@ -373,13 +373,13 @@ def seed():
   # Create rent invoice histories
   rent_invoice_histories = [
     {'status': MachineStatusEnum.HIRING.value, 'rent_invoice_id': 1},
-    {'status': MachineStatusEnum.FIXING.value, 'rent_invoice_id': 2},
+    {'status': MachineStatusEnum.HIRING.value, 'rent_invoice_id': 2},
     {'status': MachineStatusEnum.HIRING.value, 'rent_invoice_id': 3},
     {'status': MachineStatusEnum.HIRING.value, 'rent_invoice_id': 4},
-    {'status': MachineStatusEnum.FIXING.value, 'rent_invoice_id': 5},
-    {'status': MachineStatusEnum.FIXING.value, 'rent_invoice_id': 6},
+    {'status': MachineStatusEnum.HIRING.value, 'rent_invoice_id': 5},
+    {'status': MachineStatusEnum.HIRING.value, 'rent_invoice_id': 6},
     {'status': MachineStatusEnum.HIRING.value, 'rent_invoice_id': 7},
-    {'status': MachineStatusEnum.FIXING.value, 'rent_invoice_id': 8},
+    {'status': MachineStatusEnum.HIRING.value, 'rent_invoice_id': 8},
     # Add more rent invoice histories...
   ]
   
