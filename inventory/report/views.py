@@ -23,6 +23,7 @@ from inventory.location.models import Location
 from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice
 from inventory.report.forms import MachineAvailabilityForm, SchoolReportForm, SchoolReportTypeEnum
 from inventory.tool.models import InvoiceItem, SellInvoice
+from inventory.utils import flash_errors
 
 blueprint = Blueprint("report", __name__, static_folder="../static")
 
@@ -195,7 +196,6 @@ def get_filtered_machines(start_date, end_date, selected_serial, selected_model)
 def machine_availability():
   """List available machines in the store for a specific date range."""
   form = MachineAvailabilityForm()  # This form should have start_date and end_date fields
-  available_machines = []
   machines_report = []
 
   if form.validate_on_submit():
@@ -206,9 +206,9 @@ def machine_availability():
 
     # Get the filtered machines for the given date range, serial, and model
     machines_report = get_filtered_machines(start_date, end_date, selected_serial, selected_model)
-    
   else:
-    flash("Please enter valid dates.", "danger")
+    flash_errors(form)
+    
   return render_template("reports/machine_availability.html", form=form, machines=machines_report)
 
 @blueprint.route('/export_machine_availability', methods=['GET'])

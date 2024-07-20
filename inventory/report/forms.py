@@ -1,8 +1,9 @@
 # forms.py
 from enum import Enum
+from flask import current_app
 from flask_wtf import FlaskForm
 from sqlalchemy import and_
-from wtforms import DateTimeField, SelectField
+from wtforms import DateTimeField, SelectField, ValidationError
 from wtforms.validators import DataRequired
 
 from inventory.location.models import Location, LocationType, LocationTypeEnum
@@ -48,3 +49,8 @@ class MachineAvailabilityForm(FlaskForm):
     # Set the choices for the serial and model fields
     self.serial.choices = serials
     self.model.choices = models
+  
+  def validate_end_date(self, field):
+    if self.start_date.data and field.data:
+      if field.data < self.start_date.data:
+        raise ValidationError("End date should not be earlier than start date.")
