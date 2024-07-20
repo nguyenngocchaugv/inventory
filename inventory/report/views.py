@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Report views."""
+from datetime import datetime
 import io
 from flask import (
     Blueprint,
@@ -21,7 +22,7 @@ from flask_login import login_required
 
 from inventory.location.models import Location
 from inventory.machine.models import Machine, MachineStatusEnum, RentInvoice
-from inventory.report.forms import MachineAvailabilityForm, SchoolReportForm, SchoolReportTypeEnum
+from inventory.report.forms import MachineAvailabilityForm, SchoolReportForm, SchoolReportTypeEnum, SoldToolsForm
 from inventory.tool.models import InvoiceItem, SellInvoice
 from inventory.utils import flash_errors
 
@@ -214,6 +215,7 @@ def machine_availability():
 @blueprint.route('/export_machine_availability', methods=['GET'])
 @login_required
 def export_machine_availability():
+  
   """Export filtered machines to Excel."""
   
   serial = request.args.get('serial')
@@ -270,3 +272,103 @@ def export_machine_availability():
   
   # Create a Flask response with the Excel file
   return send_file(output, download_name='available-machine.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+@blueprint.route("/sold_tools", methods=["GET", "POST"])
+@login_required
+def sold_tools():
+  """List tools sold in the store."""
+  form = SoldToolsForm()
+  tools_report = []
+  
+  if form.validate_on_submit():
+    start_date = form.start_date.data
+    end_date = form.end_date.data
+    selected_type = form.type.data
+    selected_model = form.model.data
+    
+    tools_report = get_sold_tools(start_date, end_date, selected_type, selected_model)
+  else:
+    flash_errors(form)
+    
+  return render_template("reports/sold_tools.html", form=form, sold_tools=tools_report)
+
+def get_sold_tools(start_date, end_date, selected_type, selected_model):
+  """Get sold tools for the given date range, type, and model."""
+  base_query = InvoiceItem.query.join(SellInvoice, InvoiceItem.invoice_id == SellInvoice.id)
+  
+  if selected_type != 'All':
+    base_query = base_query.filter(InvoiceItem.tool_type == selected_type)
+  if selected_model != 'All':
+    base_query = base_query.filter(InvoiceItem.tool_model == selected_model)
+    
+  tools_report = base_query.filter(
+    and_(
+      SellInvoice.issue_date >= start_date,
+      SellInvoice.issue_date <= end_date
+    )
+  ).all()
+  
+  tools_report = [
+    {
+      "type": tool.tool_type,
+     "model": tool.tool_model,
+     "quantity": tool.quantity,
+     "price": tool.price,
+     "sold_date": tool.invoice.issue_date.strftime('%m-%d-%Y')
+    }
+    for tool in tools_report
+  ]
+  
+  return tools_report
+
+@blueprint.route('/export_sold_tools', methods=['GET'])
+@login_required
+def export_sold_tools():
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  type = request.args.get('type')
+  model = request.args.get('model')
+  
+  tools_report = get_sold_tools(start_date, end_date, type, model)
+  
+  # Convert start_date and end_date from string to datetime objects
+  start_date = datetime.strptime(start_date.split(' ')[0], '%Y-%m-%d') if start_date else None
+  end_date = datetime.strptime(end_date.split(' ')[0], '%Y-%m-%d') if end_date else None
+  
+  if not tools_report:
+    flash("No data to export.", "danger")
+    return redirect(url_for('report.sold_tools'))
+  
+  df = pd.DataFrame(tools_report)
+  
+  output = io.BytesIO()
+  
+  with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+     # Rename the DataFrame columns
+    df.columns = ['Type', 'Model', 'Quantity', 'Price', 'Sold Date']
+    
+    df.to_excel(writer, sheet_name='Sold Tools', startrow=7)
+    workbook = writer.book
+    worksheet = writer.sheets['Sold Tools']
+    
+    title_format = workbook.add_format({'bold': True, 'font_size': 14})
+     # Create a format for the title
+    title_format = workbook.add_format({'bold': True, 'font_size': 18})
+    
+    # Write the title and details to the Excel file
+    worksheet.write('A1', 'Sold Tools Report', title_format)
+    worksheet.write('A3', 'Type:')
+    worksheet.write('B3', type)
+    worksheet.write('D3', 'Model:')
+    worksheet.write('E3', model)
+    worksheet.write('A5', 'Start Date:')
+    worksheet.write('B5', start_date.strftime('%m-%d-%Y'))
+    worksheet.write('D5', 'End Date:')
+    worksheet.write('E5', end_date.strftime('%m-%d-%Y'))
+    
+    border_format = workbook.add_format({'border': 1})
+    worksheet.conditional_format('A8:F{}'.format(len(df)+8), {'type': 'no_errors', 'format': border_format})
+    
+  output.seek(0)
+    
+  return send_file(output, download_name='sold_tools.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
