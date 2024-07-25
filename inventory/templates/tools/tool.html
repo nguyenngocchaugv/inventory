@@ -22,7 +22,7 @@
         {% if mode == 'View' %}
         <a href="{{ url_for('tool.edit_tool', tool_id=tool.id) }}" class="btn btn-primary">Edit</a>
         <a href="{{ url_for('tool.copy_tool', tool_id=tool.id) }}" class="btn btn-primary">Copy</a>
-        <a id="tools-delete-btn" class="btn btn-danger"
+        <a class="btn btn-danger tools-delete-btn"
           data-url="{{ url_for('tool.delete_tool', tool_id=tool.id) }}" data-bs-toggle="modal"
           data-bs-target="#toolDeleteModal">
           Delete

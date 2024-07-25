@@ -4,7 +4,7 @@ $(() => {
   // Delete tool confirmation
   let deleteUrl;
 
-  $('#tools-delete-btn').on('click', (event) => {
+  $('.tools-delete-btn').on('click', (event) => {
     deleteUrl = $(event.currentTarget).data('url');
   });
 

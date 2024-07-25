@@ -2,7 +2,7 @@ $(() => {
   // Delete machine confirmation
   let deleteUrl;
 
-  $('#machines-delete-btn').on('click', (event) => {
+  $('.machines-delete-btn').on('click', (event) => {
     deleteUrl = $(event.currentTarget).data('url');
   });
 

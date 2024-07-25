@@ -2,7 +2,7 @@ $(() => {
   // Delete user confirmation
   let deleteUrl;
 
-  $('#users-delete-btn').on('click', (event) => {
+  $('.users-delete-btn').on('click', (event) => {
     deleteUrl = $(event.currentTarget).data('url');
   });
 

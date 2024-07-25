@@ -21,7 +21,7 @@
       {% if mode == 'View' %}
       <a href="{{ url_for('location.edit_location', location_id=location.id) }}" class="btn btn-primary">Edit</a>
       <a href="{{ url_for('location.copy_location', location_id=location.id) }}" class="btn btn-primary">Copy</a>
-      <a id="locations-delete-btn" class="btn btn-danger"
+      <a class="btn btn-danger locations-delete-btn"
         data-url="{{ url_for('location.delete_location', location_id=location.id) }}" data-bs-toggle="modal"
         data-bs-target="#locationDeleteModal">
         Delete

@@ -2,7 +2,7 @@ $(() => {
   // Delete location confirmation
   let deleteUrl;
 
-  $('#locations-delete-btn').on('click', (event) => {
+  $('.locations-delete-btn').on('click', (event) => {
     deleteUrl = $(event.currentTarget).data('url');
   });
 

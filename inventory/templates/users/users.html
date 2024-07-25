@@ -65,7 +65,7 @@
             or (current_user.role.name == 'Admin'
             and user.role.name != 'Admin' and current_user.id != user.id))
             %}
-            <a id="users-delete-btn" class="btn btn-sm btn-danger"
+            <a class="btn btn-sm btn-danger users-delete-btn"
               data-url="{{ url_for('user.delete_user', user_id=user.id) }}" data-bs-toggle="modal"
               data-bs-target="#userDeleteModal">
               Delete

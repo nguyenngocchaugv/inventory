@@ -70,7 +70,7 @@
             <a class="btn btn-sm btn-primary"
               href="{{ url_for('machine.view_machine', machine_id=machine.id) }}">View</a>
             {% if machine.status == 'AVAILABLE' %}
-            <a id="machines-delete-btn" class="btn btn-sm btn-danger"
+            <a class="btn btn-sm btn-danger machines-delete-btn"
               data-url="{{ url_for('machine.delete_machine', machine_id=machine.id) }}" data-bs-toggle="modal"
               data-bs-target="#machineDeleteModal">
               Delete

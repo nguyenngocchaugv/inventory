@@ -22,7 +22,7 @@
       <a href="{{ url_for('machine.edit_machine', machine_id=machine.id) }}" class="btn btn-primary">Edit</a>
       <a href="{{ url_for('machine.copy_machine', machine_id=machine.id) }}" class="btn btn-primary">Copy</a>
       {% if form.status.data == 'AVAILABLE' %}
-      <a id="machines-delete-btn" class="btn btn-danger"
+      <a class="btn btn-danger machines-delete-btn"
         data-url="{{ url_for('machine.delete_machine', machine_id=machine.id) }}" data-bs-toggle="modal"
         data-bs-target="#machineDeleteModal">
         Delete
