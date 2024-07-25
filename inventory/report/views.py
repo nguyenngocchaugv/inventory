@@ -27,6 +27,85 @@ from inventory.utils import flash_errors
 
 blueprint = Blueprint("report", __name__, static_folder="../static")
 
+def get_reported_schools(type, location_id, city):
+  """Get reported schools based on the type, location_id, and city."""
+  invoices = []
+  
+  query_conditions = []
+  
+  # Initialize an empty list to hold the final results
+  final_invoices = []
+  
+  if location_id != "All":
+    query_conditions.append(Location.name == location_id)
+  if city != "All":
+    query_conditions.append(Location.city == city)
+  
+  
+  # Check if type is not "All", then filter by the specific type
+  if type != "All": 
+    if type == SchoolReportTypeEnum.RENT.value:
+      query = db.session.query(
+              Location.name.label('school_name'),
+              RentInvoice.machine_type.label('type'),
+              RentInvoice.machine_model.label('model'),
+              db.literal(1).label('quantity') # Quantity is always 1 for rent invoices
+            ).join(RentInvoice, Location.id == RentInvoice.location_id
+            )
+            
+      if query_conditions:
+        query = query.filter(*query_conditions)
+
+      invoices = query.all()
+      final_invoices.extend(invoices)
+      
+    elif type == SchoolReportTypeEnum.SELL.value:
+      query = db.session.query(
+          Location.name.label('school_name'),
+          InvoiceItem.tool_type.label('type'),
+          InvoiceItem.tool_model.label('model'),
+          InvoiceItem.quantity.label('quantity')
+      ).join(SellInvoice, Location.id == SellInvoice.location_id
+      ).join(InvoiceItem, SellInvoice.id == InvoiceItem.invoice_id)
+      
+      if query_conditions:
+        query = query.filter(*query_conditions)
+      
+      invoices = query.all()
+      final_invoices.extend(invoices)
+  # If type is "All", combine queries for both RENT and SELL types
+  else:
+    # Query for RENT type
+    rent_query = db.session.query(
+      Location.name.label('school_name'),
+      RentInvoice.machine_type.label('type'),
+      RentInvoice.machine_model.label('model'),
+      db.literal(1).label('quantity')
+    ).join(RentInvoice, Location.id == RentInvoice.location_id)
+    
+    # Query for SELL type
+    sell_query = db.session.query(
+      Location.name.label('school_name'),
+      InvoiceItem.tool_type.label('type'),
+      InvoiceItem.tool_model.label('model'),
+      InvoiceItem.quantity.label('quantity')
+    ).join(SellInvoice, Location.id == SellInvoice.location_id
+          ).join(InvoiceItem, SellInvoice.id == InvoiceItem.invoice_id)
+  
+     # Apply common conditions to both queries
+    if query_conditions:
+      rent_query = rent_query.filter(*query_conditions)
+      sell_query = sell_query.filter(*query_conditions)
+      
+    # Execute both queries and combine results
+    final_invoices.extend(rent_query.all())
+    final_invoices.extend(sell_query.all())
+          
+  # Convert list of tuples to list of dictionaries
+  invoices = [dict(zip(['school_name', 'type', 'model', 'quantity'], invoice)) for invoice in final_invoices]
+  
+  return invoices
+
 @blueprint.route("/schools", methods=["GET", "POST"])
 @login_required
 def schools():
@@ -38,32 +117,7 @@ def schools():
   location_id = form.location.data
   city = form.city.data
   
-  if type == SchoolReportTypeEnum.RENT.value:
-    invoices = db.session.query(
-            Location.name.label('school_name'),
-            RentInvoice.machine_type.label('type'),
-            RentInvoice.machine_model.label('model'),
-            db.literal(1).label('quantity') # Quantity is always 1 for rent invoices
-          ).join(RentInvoice, Location.id == RentInvoice.location_id
-          ).filter(
-              RentInvoice.location_id == location_id,
-              Location.city == city,
-          ).all()
-  if type == SchoolReportTypeEnum.SELL.value:
-    invoices = db.session.query(
-        Location.name.label('school_name'),
-        InvoiceItem.tool_type.label('type'),
-        InvoiceItem.tool_model.label('model'),
-        InvoiceItem.quantity.label('quantity')
-    ).join(SellInvoice, Location.id == SellInvoice.location_id
-    ).join(InvoiceItem, SellInvoice.id == InvoiceItem.invoice_id
-    ).filter(
-        SellInvoice.location_id == location_id,
-        Location.city == city,
-    ).all()
-          
-  # Convert list of tuples to list of dictionaries
-  invoices = [dict(zip(['school_name', 'type', 'model', 'quantity'], invoice)) for invoice in invoices]
+  invoices = get_reported_schools(type, location_id, city)
     
   return render_template("reports/schools.html", form=form, invoices=invoices)
   
@@ -76,38 +130,13 @@ def export_schools():
   location_id = request.args.get('location_id')
   city = request.args.get('city')
 
-  invoices = []
-  
-  if type == SchoolReportTypeEnum.RENT.value:
-    invoices = db.session.query(
-            Location.name.label('school_name'),
-            RentInvoice.machine_type.label('type'),
-            RentInvoice.machine_model.label('model'),
-            db.literal(1).label('quantity') # Quantity is always 1 for rent invoices
-          ).join(RentInvoice, Location.id == RentInvoice.location_id
-          ).filter(
-              RentInvoice.location_id == location_id,
-              Location.city == city,
-          ).all()
-  if type == SchoolReportTypeEnum.SELL.value:
-    invoices = db.session.query(
-        Location.name.label('school_name'),
-        InvoiceItem.tool_type.label('type'),
-        InvoiceItem.tool_model.label('model'),
-        InvoiceItem.quantity.label('quantity')
-    ).join(SellInvoice, Location.id == SellInvoice.location_id
-    ).join(InvoiceItem, SellInvoice.id == InvoiceItem.invoice_id
-    ).filter(
-        SellInvoice.location_id == location_id,
-        Location.city == city,
-    ).all()
+  invoices = get_reported_schools(type, location_id, city)
     
   # Get the school name from the Location model
-  school_name = Location.query.filter_by(id=location_id).first().name
+  school_name = None
+  if (location_id != "All"):
+    school_name = Location.query.filter_by(id=location_id).first().name
           
-  # Convert list of tuples to list of dictionaries
-  invoices = [dict(zip(['school_name', 'type', 'model', 'quantity'], invoice)) for invoice in invoices]
-
   # Convert the invoices data to a pandas DataFrame
   df = pd.DataFrame(invoices)
   
@@ -122,11 +151,13 @@ def export_schools():
     # Rename the DataFrame columns
     df.columns = ['School Name', 'Type', 'Model', 'Quantity']
     
+    sheet_name = 'Reported Schools'
+    
     # Write the DataFrame to the Excel file
-    df.to_excel(writer, sheet_name='Sheet1', startrow=6)
+    df.to_excel(writer, sheet_name=sheet_name, startrow=6)
     
     workbook = writer.book
-    worksheet = writer.sheets['Sheet1']
+    worksheet = writer.sheets[sheet_name]
     
     # Create a format for the cell borders
     border_format = workbook.add_format({'border': 1})
@@ -139,13 +170,22 @@ def export_schools():
     title_format = workbook.add_format({'bold': True, 'font_size': 18})
     
      # Write the title to the Excel file
-    title = 'Summary of Machines' if type == SchoolReportTypeEnum.RENT.value else 'Summary of Tools'
+    title = None
+    if type == SchoolReportTypeEnum.RENT.value:
+      title = 'Reported Schools for Rent'
+    elif type == SchoolReportTypeEnum.SELL.value:
+      title = 'Reported Schools for Sell'
+    else:
+      title = 'Reported Schools'
+    
     worksheet.write('A1', title, title_format)
     
     
     # Write the additional information to the Excel file
     worksheet.write('A3', 'Type: ' + type)
-    worksheet.write('A4', 'School Name: ' + school_name)
+    if (school_name):
+      worksheet.write('A4', 'School Name: ' + school_name)
+    
     worksheet.write('A5', 'City: ' + city)
 
   # Create a Flask response with the Excel file

@@ -17,16 +17,25 @@ class SchoolReportTypeEnum(Enum):
 class SchoolReportForm(FlaskForm):
   location = SelectField('Location', coerce=str, validators=[DataRequired()])
   city = SelectField('City', coerce=str, validators=[DataRequired()])
-  type = SelectField('Type', validators=[DataRequired()], choices=[(report_type.value, report_type.value) for report_type in SchoolReportTypeEnum])
+  type = SelectField('Type', coerce=str, validators=[DataRequired()])
   
   def __init__(self, *args, **kwargs):
     super(SchoolReportForm, self).__init__(*args, **kwargs)
-    all_schools = Location.query.join(Location.location_type).filter(and_(LocationType.name==LocationTypeEnum.SCHOOL.value, Location.is_deleted == False)).all()
+    all_schools = Location.query.join(Location.location_type).filter(and_(
+      LocationType.name==LocationTypeEnum.SCHOOL.value,
+      Location.is_deleted == False
+    )).all()
     
-    self.location.choices = [(str(location.id), location.name) for location in all_schools]
+    locations = [("All", "All")] + [(location.name, location.name) for location in all_schools]
+    locations.sort(key=lambda x: x[1])
+    self.location.choices = locations
     
-    city_names = list(set([location.city for location in all_schools]))
-    self.city.choices = [(city_name, city_name) for city_name in city_names]
+    city_names =  [("All", "All")] + list(set((location.city, location.city) for location in all_schools))
+    city_names.sort(key=lambda x: x[1]) 
+    self.city.choices = city_names
+  
+    types =  [("All", "All")] + [(report_type.value, report_type.value) for report_type in SchoolReportTypeEnum]
+    self.type.choices = types
     
 class MachineAvailabilityForm(FlaskForm):
   serial = SelectField('Serial', coerce=str, validators=[DataRequired()])
