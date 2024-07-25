@@ -2,6 +2,7 @@
 """Public forms."""
 from collections import defaultdict
 from flask_wtf import FlaskForm
+from sqlalchemy import and_
 from wtforms import DateTimeField, DecimalField, FieldList, FormField, HiddenField, SelectField, StringField, IntegerField, SubmitField, FloatField, ValidationError
 from wtforms.validators import DataRequired, NumberRange
 
@@ -64,7 +65,7 @@ class SellInvoiceForm(FlaskForm):
     super(SellInvoiceForm, self).__init__(*args, **kwargs)
     locations = [(str(location.id), location.name) for location in Location.query
                  .join(Location.location_type)
-                 .filter(LocationType.name==LocationTypeEnum.SCHOOL.value).all()]
+                 .filter(and_(LocationType.name==LocationTypeEnum.SCHOOL.value, Location.is_deleted == False, Location.is_active == True)).all()]
     locations.insert(0, ('', 'Select a school...'))
     self.location.choices = locations
     
