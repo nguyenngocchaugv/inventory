@@ -23,10 +23,17 @@
 
   <!-- Export Button -->
   <div class="d-flex justify-content-end">
-    <a class="btn btn-secondary"
-      href="{{ url_for('report.export_rented_machines', start_date=form.start_date.data, end_date=form.end_date.data) }}"><i
-      class="fa-solid fa-download"></i> Export
-    </a>
+    {% if rent_invoices %}
+      <div class="btn-group">
+        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fa-solid fa-download"></i> Export
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{{ url_for('report.export_rented_machines_to_excel', start_date=form.start_date.data, end_date=form.end_date.data) }}">Export to Excel</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('report.export_rented_machines_to_pdf', start_date=form.start_date.data, end_date=form.end_date.data) }}">Export to PDF</a></li>
+        </ul>
+      </div>
+    {% endif %}
   </div>
 
   {% if rent_invoices %}

@@ -26,7 +26,17 @@
 
   <!-- Export Button -->
   <div class="d-flex justify-content-end">
-    <a class="btn btn-secondary" href="{{ url_for('report.export_schools', type=form.type.data, location_id=form.location.data, city=form.city.data) }}"><i class="fa-solid fa-download"></i> Export</a>
+    {% if invoices %}
+      <div class="btn-group">
+        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fa-solid fa-download"></i> Export
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{{ url_for('report.export_schools_to_excel', type=form.type.data, location_id=form.location.data, city=form.city.data) }}">Export to Excel</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('report.export_schools_to_pdf', type=form.type.data, location_id=form.location.data, city=form.city.data) }}">Export to PDF</a></li>
+        </ul>
+      </div>
+    {% endif %}
   </div>
 
   {% if invoices %}

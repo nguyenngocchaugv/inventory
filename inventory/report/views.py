@@ -14,6 +14,10 @@ from flask import (
 )
 import pandas as pd
 from sqlalchemy import and_, or_
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
 from inventory.extensions import (
   db,
 )
@@ -121,9 +125,9 @@ def schools():
     
   return render_template("reports/schools.html", form=form, invoices=invoices)
   
-@blueprint.route('/export_schools', methods=['GET'])
+@blueprint.route('/export_schools_to_excel', methods=['GET'])
 @login_required
-def export_schools():
+def export_schools_to_excel():
   """Export schools to Excel."""
   
   type = request.args.get('type')
@@ -192,6 +196,74 @@ def export_schools():
   output.seek(0)
   return send_file(output, download_name='schools.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
+@blueprint.route("/export_schools_to_pdf", methods=["GET", "POST"])
+@login_required
+def export_schools_to_pdf():
+  """Export schools to PDF."""
+  type = request.args.get('type')
+  location_id = request.args.get('location_id')
+  city = request.args.get('city')
+  invoices = get_reported_schools(type, location_id, city)
+  
+  # Convert list of dictionaries to list of lists
+  invoices_list = [['School Name', 'Type', 'Model', 'Quantity']]
+  for invoice in invoices:
+    invoices_list.append([invoice['school_name'], invoice['type'], invoice['model'], invoice['quantity']])
+
+
+  # Get the school name from the Location model
+  school_name = None
+  if location_id != "All":
+      school_name = Location.query.filter_by(id=location_id).first().name
+
+  if not invoices:
+      flash("No data to export.", "danger")
+      return redirect(url_for('report.schools'))
+
+  # Create a BytesIO buffer for the PDF
+  buffer = io.BytesIO()
+  doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
+
+  # Create a list to add the elements
+  elements = []
+
+  # Define the style
+  styles = getSampleStyleSheet()
+
+  # Add the title
+  report_title = "Reported Schools" if type == "All" else f"Reported Schools for {type}"
+  elements.append(Paragraph(report_title, styles['Title']))
+
+  # Add additional information
+  if school_name:
+      elements.append(Paragraph(f"School Name: {school_name}", styles['Normal']))
+  elements.append(Paragraph(f"City: {city}", styles['Normal']))
+  elements.append(Spacer(1, 12))
+
+  # Create the table data
+  data = invoices_list
+
+  # Create a table and style it
+  table = Table(data)
+  table.setStyle(TableStyle([
+      ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+      ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+      ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+      ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+      ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+      ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+      ('GRID', (0,0), (-1,-1), 1, colors.black)
+  ]))
+  elements.append(table)
+
+  # Build the PDF
+  doc.build(elements)
+
+  # Move the buffer's pointer to the beginning so the data can be read
+  buffer.seek(0)
+
+  return send_file(buffer, download_name="schools_report.pdf", as_attachment=True, mimetype='application/pdf')
+
 def get_filtered_machines(start_date, end_date, selected_serial, selected_model):
   """Get filtered machines for the given date range, serial, and model."""
   # Base query for AVAILABLE machines
@@ -251,9 +323,9 @@ def machine_availability():
     
   return render_template("reports/machine_availability.html", form=form, machines=machines_report)
 
-@blueprint.route('/export_machine_availability', methods=['GET'])
+@blueprint.route('/export_machine_availability_to_excel', methods=['GET'])
 @login_required
-def export_machine_availability():
+def export_machine_availability_to_excel():
   
   """Export filtered machines to Excel."""
   
@@ -312,6 +384,68 @@ def export_machine_availability():
   # Create a Flask response with the Excel file
   return send_file(output, download_name='available-machine.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
+@blueprint.route('/export_machine_availability_to_pdf', methods=['GET'])
+@login_required
+def export_machine_availability_to_pdf():
+  """Export filtered machines to PDF."""
+  
+  serial = request.args.get('serial')
+  model = request.args.get('model')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  
+  # Get the filtered machines for the given date range, serial, and model
+  machines_report = get_filtered_machines(start_date, end_date, serial, model)
+  
+  # Convert the list of dictionaries to a list of lists
+  machines_list = [['Serial', 'Model', 'Status', 'Description']]
+  for machine in machines_report:
+    machines_list.append([machine['serial'], machine['model'], machine['status'], machine['description']])
+  
+  # Create a BytesIO buffer for the PDF
+  buffer = io.BytesIO()
+  doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
+  
+  # Create a list to add the elements
+  elements = []
+  
+  # Define the style
+  styles = getSampleStyleSheet()
+  
+  # Add the title
+  elements.append(Paragraph("Available Machines Report", styles['Title']))
+  
+  # Add additional information
+  elements.append(Paragraph(f"Serial: {serial}", styles['Normal']))
+  elements.append(Paragraph(f"Model: {model}", styles['Normal']))
+  elements.append(Paragraph(f"Start Date: {start_date}", styles['Normal']))
+  elements.append(Paragraph(f"End Date: {end_date}", styles['Normal']))
+  elements.append(Spacer(1, 12))
+  
+  # Create the table data
+  data = machines_list
+  
+  # Create a table and style it
+  table = Table(data)
+  table.setStyle(TableStyle([
+    ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+    ('GRID', (0,0), (-1,-1), 1, colors.black)
+  ]))
+  elements.append(table)
+  
+  # Build the PDF
+  doc.build(elements)
+  
+  # Move the buffer's pointer to the beginning so the data can be read
+  buffer.seek(0)
+  
+  return send_file(buffer, download_name="available-machines-report.pdf", as_attachment=True, mimetype='application/pdf')
+
 @blueprint.route("/sold_tools", methods=["GET", "POST"])
 @login_required
 def sold_tools():
@@ -360,9 +494,9 @@ def get_sold_tools(start_date, end_date, selected_type, selected_model):
   
   return tools_report
 
-@blueprint.route('/export_sold_tools', methods=['GET'])
+@blueprint.route('/export_sold_tools_to_excel', methods=['GET'])
 @login_required
-def export_sold_tools():
+def export_sold_tools_to_excel():
   start_date = request.args.get('start_date')
   end_date = request.args.get('end_date')
   type = request.args.get('type')
@@ -416,6 +550,65 @@ def export_sold_tools():
     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   )
   
+@blueprint.route('/export_sold_tools_to_pdf', methods=['GET'])
+@login_required
+def export_sold_tools_to_pdf():
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  type = request.args.get('type')
+  model = request.args.get('model')
+  
+  tools_report = get_sold_tools(start_date, end_date, type, model)
+  
+  # Convert the list of dictionaries to a list of lists
+  tools_list = [['Type', 'Model', 'Quantity', 'Price', 'Sold Date']]
+  for tool in tools_report:
+    tools_list.append([tool['type'], tool['model'], tool['quantity'], tool['price'], tool['sold_date']])
+  
+  # Create a BytesIO buffer for the PDF
+  buffer = io.BytesIO()
+  doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
+  
+  # Create a list to add the elements
+  elements = []
+  
+  # Define the style
+  styles = getSampleStyleSheet()
+  
+  # Add the title
+  elements.append(Paragraph("Sold Tools Report", styles['Title']))
+  
+  # Add additional information
+  elements.append(Paragraph(f"Type: {type}", styles['Normal']))
+  elements.append(Paragraph(f"Model: {model}", styles['Normal']))
+  elements.append(Paragraph(f"Start Date: {start_date}", styles['Normal']))
+  elements.append(Paragraph(f"End Date: {end_date}", styles['Normal']))
+  elements.append(Spacer(1, 12))
+  
+  # Create the table data
+  data = tools_list
+  
+  # Create a table and style it
+  table = Table(data)
+  table.setStyle(TableStyle([
+    ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+    ('GRID', (0,0), (-1,-1), 1, colors.black)
+  ]))
+  elements.append(table)
+  
+  # Build the PDF
+  doc.build(elements)
+  
+  # Move the buffer's pointer to the beginning so the data can be read
+  buffer.seek(0)
+  
+  return send_file(buffer, download_name="sold-tools-report.pdf", as_attachment=True, mimetype='application/pdf')
+  
 def get_filtered_rent_invoices_with_status_history(start_date, end_date):
   #Query RentInvoice records based on date range
   rent_invoices = db.session.query(RentInvoice).filter(
@@ -454,9 +647,9 @@ def rented_machines():
     
   return render_template("reports/rented_machines.html", form=form, rent_invoices=rent_invoices)
 
-@blueprint.route('/export_rented_machines', methods=['GET'])
+@blueprint.route('/export_rented_machines_to_excel', methods=['GET'])
 @login_required
-def export_rented_machines():
+def export_rented_machines_to_excel():
   start_date = request.args.get('start_date')
   end_date = request.args.get('end_date')
   
@@ -518,3 +711,69 @@ def export_rented_machines():
     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   )
   
+@blueprint.route('/export_rented_machines_to_pdf', methods=['GET'])
+@login_required
+def export_rented_machines_to_pdf():
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  
+  rent_invoices = get_filtered_rent_invoices_with_status_history(start_date, end_date)
+  
+  formatted_rent_invoices = [
+    {
+      "name": invoice.name,
+      "serial": invoice.serial,
+      "location_name": invoice.location.name,
+      "start_date": invoice.start_date.strftime('%m-%d-%Y'),
+      "end_date": invoice.end_date.strftime('%m-%d-%Y'),
+      "status_history": invoice.status_history
+    }
+    for invoice in rent_invoices
+  ]
+  
+  # Convert the list of dictionaries to a list of lists
+  rent_invoices_list = [['Name', 'Serial', 'Location Name', 'Start Date', 'End Date', 'Statuses']]
+  for invoice in formatted_rent_invoices:
+    rent_invoices_list.append([invoice['name'], invoice['serial'], invoice['location_name'], invoice['start_date'], invoice['end_date'], ', '.join(invoice['status_history'])])
+  
+  # Create a BytesIO buffer for the PDF
+  buffer = io.BytesIO()
+  doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
+  
+  # Create a list to add the elements
+  elements = []
+  
+  # Define the style
+  styles = getSampleStyleSheet()
+  
+  # Add the title
+  elements.append(Paragraph("Rented Machines Report", styles['Title']))
+  
+  # Add additional information
+  elements.append(Paragraph(f"Start Date: {start_date}", styles['Normal']))
+  elements.append(Paragraph(f"End Date: {end_date}", styles['Normal']))
+  elements.append(Spacer(1, 12))
+  
+  # Create the table data
+  data = rent_invoices_list
+  
+  # Create a table and style it
+  table = Table(data)
+  table.setStyle(TableStyle([
+    ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+    ('GRID', (0,0), (-1,-1), 1, colors.black)
+  ]))
+  elements.append(table)
+  
+  # Build the PDF
+  doc.build(elements)
+  
+  # Move the buffer's pointer to the beginning so the data can be read
+  buffer.seek(0)
+  
+  return send_file(buffer, download_name="rented-machines-report.pdf", as_attachment=True, mimetype='application/pdf')
