@@ -42,7 +42,7 @@ class RentInvoiceForm(FlaskForm):
     users.insert(0, ('', 'Assign to...'))
     self.user.choices = users
     
-    machines = [(str(machine.id), machine.name) for machine in Machine.query
+    machines = [(str(machine.id), f"{machine.name} ({machine.serial})") for machine in Machine.query
                 .filter(and_(Machine.status==MachineStatusEnum.AVAILABLE.value, Machine.is_deleted == False)).all()]
     machines.insert(0, ('', 'Select a machine...'))
     self.machine.choices = machines
@@ -85,7 +85,7 @@ class RentInvoiceEditForm(FlaskForm):
       self.user.choices = [(str(user.id), user.email)]
       
       machine = Machine.query.get(kwargs.get('obj').machine_id)
-      self.machine.choices = [(str(machine.id), machine.name)]
+      self.machine.choices = [(str(machine.id), f"{machine.name} ({machine.serial})")]
       
       self.status.choices = [(status.value, status.value) for status in RentInvoiceStatusEnum]
       
